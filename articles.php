@@ -48,7 +48,7 @@
     $insertBeginningOfArray = false;
     foreach ($allArticles as &$article) {
         $row = array();
-        $row[] = $article->getTitle();
+        $row[] = '<a href="bid.php?id=' . $article->getID() . '">' . $article->getTitle() . '</a>';
         $row[] = getHighestBidding($article, $currencyUtil);
         $row[] = $dateUtil->dateTimeToStringForDisplaying($article->getAddedDate(), $currentUser->getLanguage());
         $row[] = $dateUtil->dateTimeToStringForDisplaying($article->getExpiresOnDate(), $currentUser->getLanguage());

@@ -8,7 +8,7 @@ class MainMenu {
             $menu .= '<br>';
             $menu .= '<a id="styledButtonGray">' . $i18n->get('adminOptions') . ': ' . '</a>';
             $menu .= '<a id="styledButtonRed" href="userslist.php">' . $i18n->get('usersList') . '</a>';
-            $menu .= '<a id="styledButtonRed" href="biddingslist.php">' . $i18n->get('biddingslist') . '</a>';
+            $menu .= '<a id="styledButtonRed" href="articleslist.php">' . $i18n->get('articlesList') . '</a>';
             $menu .= '<a id="styledButtonRed" href="logevents.php">' . $i18n->get('logEvents') . '</a>';
             $menu .= '<a id="styledButtonRed" href="unittests.php">' . $i18n->get('unitTests') . '</a>';
             $menu .= '<a id="styledButtonRed" href="recurringtasks.php">' . $i18n->get('recurringTasks') . '</a>';

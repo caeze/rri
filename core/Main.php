@@ -25,7 +25,7 @@
 
     // include the database connection class
     require_once('lib_classes/PostgresDBConn.php');
-    $postgresDbConn = new PostgresDBConn(Constants::POSTGRES_HOST, Constants::POSTGRES_PORT, Constants::POSTGRES_DB_NAME, Constants::POSTGRES_USER, Constants::POSTGRES_PASSWORD, 'COLUMN_NAMES');
+    $dbConn = new DBConn(Constants::POSTGRES_HOST, Constants::POSTGRES_PORT, Constants::POSTGRES_DB_NAME, Constants::POSTGRES_USER, Constants::POSTGRES_PASSWORD, 'COLUMN_NAMES');
     
     // internationalization
     include_once 'i18n/I18n.php';
@@ -49,7 +49,7 @@
     
     // include the database untility class
     require_once('lib_classes/PostgresDBConnDatabaseUtility.php');
-    $databaseUtility = new PostgresDBConnDatabaseUtility($postgresDbConn, $dateUtil);
+    $databaseUtility = new DBConnDatabaseUtility($dbConn, $dateUtil);
     //$databaseUtility->recreateDatabase();
 
     // include all data classes
@@ -64,17 +64,17 @@
     require_once('dao_classes/LogEventDao.php');
     require_once('dao_classes/UserDao.php');
     require_once('dao_classes/RecurringTasksDao.php');
-    $articleDao = new ArticleDao($postgresDbConn);
-    $logEventDao = new LogEventDao($postgresDbConn, $dateUtil);
-    $userDao = new UserDao($postgresDbConn, $dateUtil);
-    $recurringTasksDao = new RecurringTasksDao($postgresDbConn, $dateUtil);
+    $articleDao = new ArticleDao($dbConn, $dateUtil);
+    $logEventDao = new LogEventDao($dbConn, $dateUtil);
+    $userDao = new UserDao($dbConn, $dateUtil);
+    $recurringTasksDao = new RecurringTasksDao($dbConn, $dateUtil);
 
     // include all system classes
     require_once('system_classes/ArticleSystem.php');
     require_once('system_classes/LogEventSystem.php');
     require_once('system_classes/UserSystem.php');
     require_once('system_classes/RecurringTasksSystem.php');
-    $articleSystem = new ArticleSystem($articleDao, $dateUtil, $fileUtil, $hashUtil);
+    $articleSystem = new ArticleSystem($articleDao, $dateUtil, $fileUtil, $hashUtil, $currencyUtil, $email);
     $logEventSystem = new LogEventSystem($logEventDao, $email, $dateUtil);
     $userSystem = new UserSystem($userDao, $email, $i18n, $hashUtil, $urlUtil, $dateUtil);
     $recurringTasksSystem = new RecurringTasksSystem($recurringTasksDao, $dateUtil, $fileUtil);
@@ -84,17 +84,19 @@
     $log = new Log($logEventSystem, $dateUtil);
     
     // set log object reference to all classes where logging shall happen
-    $postgresDbConn->setLog($log);
+    $dbConn->setLog($log);
     $fileUtil->setLog($log);
     $i18n->setLog($log);
     $logEventSystem->setLog($log);
     $userSystem->setLog($log);
+    $articleSystem->setLog($log);
     $recurringTasksSystem->setLog($log);
+    $currencyUtil->setLog($log);
     
     // instantiate the unit tests so they can be run from the admin page
     require_once('test/TestUtil.php');
-    $postgresDbConnTests = new PostgresDBConn(Constants::POSTGRES_HOST, Constants::POSTGRES_PORT, Constants::POSTGRES_DB_NAME_UNIT_TESTS, Constants::POSTGRES_USER, Constants::POSTGRES_PASSWORD, 'COLUMN_NAMES');
-    $testUtil = new TestUtil($log, $postgresDbConnTests, $dateUtil, $fileUtil);
+    $dbConnTests = new DBConn(Constants::POSTGRES_HOST, Constants::POSTGRES_PORT, Constants::POSTGRES_DB_NAME_UNIT_TESTS, Constants::POSTGRES_USER, Constants::POSTGRES_PASSWORD, 'COLUMN_NAMES');
+    $testUtil = new TestUtil($log, $dbConnTests, $dateUtil, $fileUtil);
     
     // show phpinfo on top of page if wanted
     if (Constants::SHOW_PHP_INFO) {

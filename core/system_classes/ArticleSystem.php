@@ -4,13 +4,17 @@ class ArticleSystem {
     private $dateUtil = null;
     private $fileUtil = null;
     private $hashUtil = null;
+    private $currencyUtil = null;
+    private $email = null;
     private $log = null;
 
-    function __construct($articleDao, $dateUtil, $fileUtil, $hashUtil) {
+    function __construct($articleDao, $dateUtil, $fileUtil, $hashUtil, $currencyUtil, $email) {
         $this->articleDao = $articleDao;
         $this->dateUtil = $dateUtil;
         $this->fileUtil = $fileUtil;
         $this->hashUtil = $hashUtil;
+        $this->currencyUtil = $currencyUtil;
+        $this->email = $email;
     }
 
     /**
@@ -37,23 +41,47 @@ class ArticleSystem {
     /**
      * Returns the article from the DB according to the given unique article ID or NULL if the article was not found.
      */
-    function getArticle($protocolID) {
-        return $this->articleDao->getArticle($protocolID);
+    function getArticle($articleID) {
+        return $this->articleDao->getArticle($articleID);
     }
     
     /**
      * Adds an article to the database and moves the protocol file to the protocols location with a randomly generated name.
      * Returns the just added protocol with the ID set if the operation was successful, NULL otherwise.
      */
-    function addArticle($currentUser, $collaboratorIDs, $remark, $examiner, $fileNameTmp, $fileNameExtension, $fileSize, $fileType) {
-        $fileName = $this->hashUtil->generateRandomString() . '.' . $fileNameExtension;
-        move_uploaded_file($fileNameTmp, $this->fileUtil->getFullPathToBaseDirectory() . Constants::UPLOADED_PROTOCOLS_DIRECTORY . '/' . $fileName);
+    function addArticle($currentUser, $title, $startingPrice, $expiresOnDate, $description, $uploadedImageFilePaths, $uploadedImageFileExtensions) {
+        $imageFileNames = [];
         
-        $status = Constants::EXAM_PROTOCOL_STATUS['unchecked'];
-        $uploadedByUserID = $currentUser->getID();
-        $uploadedDate = $this->dateUtil->getDateTimeNow();
-        $article = new Article(NULL, $status, $uploadedByUserID, $collaboratorIDs, $uploadedDate, $remark, $examiner, $fileName, $fileSize, $fileType, $fileNameExtension);
-    
+        for ($i = 0; $i < count($uploadedImageFilePaths); $i++) {
+            $filePath = $uploadedImageFilePaths[$i];
+            $fileExtension = $uploadedImageFileExtensions[$i];
+            $newFileName = $this->hashUtil->generateRandomString() . '.' . $fileExtension;
+            if ($filePath != NULL && $filePath != '' && $fileExtension != NULL && $fileExtension != '') {
+                $imageFileNames[] = $newFileName;
+                move_uploaded_file($filePath, $this->fileUtil->getFullPathToBaseDirectory() . Constants::UPLOADED_IMAGES_DIRECTORY . '/' . $newFileName);
+            }
+        }
+        
+        for ($i = count($imageFileNames); $i < 5; $i++) {
+            $imageFileNames[] = '';
+        }
+        
+        $status = Constants::ARTICLE_STATUS['active'];
+        $addedByUserID = $currentUser->getID();
+        $addedDate = $this->dateUtil->getDateTimeNow();
+        $remark = '';
+        $pictureFileName1 = $imageFileNames[0];
+        $pictureFileName2 = $imageFileNames[1];
+        $pictureFileName3 = $imageFileNames[2];
+        $pictureFileName4 = $imageFileNames[3];
+        $pictureFileName5 = $imageFileNames[4];
+        $startingPrice = $this->currencyUtil->getAmountFromCurrencyString($startingPrice);
+        $expiresOnDate = $this->dateUtil->stringToDateTime($expiresOnDate);
+        $expiresOnDate = $expiresOnDate->setTime(23, 59);
+        $biddings = [];
+        
+        $article = new Article(NULL, $status, $addedByUserID, $addedDate, $remark, $title, $pictureFileName1, $pictureFileName2, $pictureFileName3, $pictureFileName4, $pictureFileName5, $startingPrice, $expiresOnDate, $description, $biddings);
+        
         $article = $this->articleDao->addArticle($article);
         if ($article == false) {
             $this->log->error(static::class . '.php', 'Error on adding article!');
@@ -69,7 +97,7 @@ class ArticleSystem {
     function updateArticle($articleID, $remark, $examiner) {
         $article = $this->articleDao->getArticle($articleID);
         if ($article == NULL) {
-            $this->log->error(static::class . '.php', 'Protocol to ID ' . $articleID . ' not found!');
+            $this->log->error(static::class . '.php', 'Article to ID ' . $articleID . ' not found!');
             return false;
         }
         $article->setRemark($remark);
@@ -84,7 +112,7 @@ class ArticleSystem {
     function updateArticleStatus($articleID, $newStatus) {
         $article = $this->articleDao->getArticle($articleID);
         if ($article == NULL) {
-            $this->log->error(static::class . '.php', 'Protocol to ID ' . $articleID . ' not found!');
+            $this->log->error(static::class . '.php', 'Article to ID ' . $articleID . ' not found!');
             return false;
         }
         $article->setStatus($newStatus);
@@ -98,7 +126,7 @@ class ArticleSystem {
     function updateArticleFully($articleID, $collaboratorIDs, $status, $uploadedByUserID, $uploadedDate, $remark, $examiner, $fileName, $fileSize, $fileType, $fileExtension) {
         $article = $this->articleDao->getArticle($articleID);
         if ($article == NULL) {
-            $this->log->error(static::class . '.php', 'Protocol to ID ' . $articleID . ' not found!');
+            $this->log->error(static::class . '.php', 'Article to ID ' . $articleID . ' not found!');
             return false;
         }
         $article->setStatus($status);
@@ -126,6 +154,63 @@ class ArticleSystem {
      */
     function getArticles($numberOfResultsWanted, $page, $articleID, $uploadedByUserID, $borrowedByUserID) {
         return $this->articleDao->getArticles($numberOfResultsWanted, $page, $articleID, $uploadedByUserID, $borrowedByUserID);
+    }
+    
+    /**
+     * Reports via mail to the admins that the article is outdated.
+     */
+    function reportArticleAsOutdated($articleID, $reportingUsername) {
+        if (!is_numeric($articleID)) {    
+            $this->log->error(static::class . '.php', 'Article ID is not numeric!');
+            return false;
+        }
+        $article = $this->getArticle($articleID);
+        if ($article == NULL) {
+            $this->log->error(static::class . '.php', 'Article to ID ' . $articleID . ' not found! Can not report as outdated!');
+            return false;
+        }
+        $message = 'The user ' . $reportingUsername . ' has reported that the article ' . $article->getTitle() . ' with ID ' . $articleID . ' is outdated. Please verify this and handle it (if necessary).';
+        $this->email->send(Constants::EMAIL_ADMIN, 'Article reported as outdated in RRI', $message);
+        return true;
+    }
+    
+    /**
+     * Adds a new bid on an article. Returns the article with the new bidding set if successful or false if something went wrong.
+     */
+    function bid($articleID, $amount, $biddingUser) {
+        $article = $this->getArticle($articleID);
+        if ($article != NULL) {
+            if ($amount <= $this->getCurrentlyHighestBidding($article)) {
+                $this->log->error(static::class . '.php', 'Can not make bid that is smaller than or equal to the highest previous bid!');
+                return false;
+            }
+            $biddings = $article->getBiddings();
+            $bidding = new Bidding(NULL, $article->getID(), $biddingUser->getID(), $this->dateUtil->getDateTimeNow(), $amount);
+            $biddings[] = $bidding;
+            $article->setBiddings($biddings);
+            $result = $this->articleDao->updateArticle($article);
+            if ($result == false) {
+                $this->log->error(static::class . '.php', 'Error on updating article bidding data on the DB!');
+                return false;
+            }
+            return $article;
+        }
+        $this->log->error(static::class . '.php', 'Article to ID ' . $articleID . ' not found!');
+        return false;
+    }
+    
+    /**
+     * Returns the currently highest bidding amount in cents for the given article.
+     * This highest amount may be the starting amount if no bids have been placed on this article yet.
+     */
+    function getCurrentlyHighestBidding($article) {
+        $currentlyHighestBidding = $article->getStartingPrice();
+        foreach ($article->getBiddings() as $bidding) {
+            if ($bidding->getAmount() > $currentlyHighestBidding) {
+                $currentlyHighestBidding = $bidding->getAmount();
+            }
+        }
+        return $currentlyHighestBidding;
     }
 }
 ?>

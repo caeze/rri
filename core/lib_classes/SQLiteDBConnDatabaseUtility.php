@@ -12,10 +12,9 @@ class DBConnDatabaseUtility {
      * Get all the table names from the database.
      */
     function getAllDatabaseTableNames() {
-        $sql = "SELECT table_name
-                FROM information_schema.tables
-                WHERE table_schema='public'
-                AND table_type='BASE TABLE';";
+        $sql = "SELECT name
+                FROM sqlite_master
+                WHERE type='table';";
         return $this->dbConn->query($sql);
     }
 
@@ -48,7 +47,7 @@ class DBConnDatabaseUtility {
      */
     function setUpEmptyUsersTable() {
         $sql = 'CREATE TABLE "Users" (
-"ID"                SERIAL PRIMARY KEY UNIQUE,
+"ID"                INTEGER PRIMARY KEY UNIQUE,
 "username"          TEXT NOT NULL UNIQUE,
 "passwordHash"      TEXT NOT NULL,
 "role"              TEXT NOT NULL,
@@ -71,7 +70,7 @@ class DBConnDatabaseUtility {
      */
     function setUpEmptyArticlesTable() {
         $sql = 'CREATE TABLE "Articles" (
-"ID"               SERIAL PRIMARY KEY UNIQUE,
+"ID"               INTEGER PRIMARY KEY UNIQUE,
 "status"           TEXT NOT NULL,
 "addedByUserID"    INT NOT NULL,
 "addedDate"        TEXT NOT NULL,
@@ -94,7 +93,7 @@ class DBConnDatabaseUtility {
      */
     function setUpEmptyBiddingsTable() {
         $sql = 'CREATE TABLE "Biddings" (
-"ID"            SERIAL PRIMARY KEY UNIQUE,
+"ID"            INTEGER PRIMARY KEY UNIQUE,
 "articleID"     INT NOT NULL,
 "biddingUserID" INT NOT NULL,
 "date"          TEXT NOT NULL,
@@ -108,7 +107,7 @@ class DBConnDatabaseUtility {
      */
     function setUpEmptyLogEventsTable() {
         $sql = 'CREATE TABLE "LogEvents" (
-"ID"                SERIAL PRIMARY KEY UNIQUE,
+"ID"                INTEGER PRIMARY KEY UNIQUE,
 "date"              TEXT NOT NULL,
 "username"          TEXT NOT NULL,
 "level"             TEXT NOT NULL,
@@ -123,7 +122,7 @@ class DBConnDatabaseUtility {
      */
     function setUpEmptyRecurringTasksTable() {
         $sql = 'CREATE TABLE "RecurringTasks" (
-"ID"                SERIAL PRIMARY KEY UNIQUE,
+"ID"                INTEGER PRIMARY KEY UNIQUE,
 "name"              TEXT NOT NULL,
 "lastRunDate"       TEXT NOT NULL,
 "periodTimeframe"   TEXT NOT NULL,

@@ -25,6 +25,7 @@ class Constants {
     
     // files
     const UPLOADED_IMAGES_DIRECTORY = 'uploaded_images';
+    const ALLOWED_FILE_EXTENSION_UPLOAD = ['png', 'jpg', 'jpeg', 'gif'];
     
     // user settings
     const DEFAULT_LANGUAGE = 'de';
@@ -38,14 +39,17 @@ class Constants {
     const SUCCESS_COLOR = '#66FF66';
     const FAILED_COLOR = '#AA0000';
     const CLEANUP_LOG_TO_NUMBER_OF_EVENTS = 10000;
+    const LOCALE_ENGLISH = ['currencyIsoCode' => 'GBP', 'currencySymbol' => '£', 'currencyExchangeRateToEuro' => 1 / 1.16, 'decimalSymbol' => '.', 'printCurrencySymbolAfterAmount' => false];
+    const LOCALE_GERMAN = ['currencyIsoCode' => 'EUR', 'currencySymbol' => '€', 'currencyExchangeRateToEuro' => 1, 'decimalSymbol' => ',', 'printCurrencySymbolAfterAmount' => true];
     
     // recurring tasks
-    const RECURRING_TASKS = ['removeToBeDeletedUsers' => 'REMOVE_TO_BE_DELETED_USERS'];
-    const RECURRING_TASKS_TIMEFRAMES = ['removeToBeDeletedUsers' => '1'];
-    const RECURRING_TASKS_UNITS = ['removeToBeDeletedUsers' => 'WEEKS'];
+    const RECURRING_TASKS = ['cleanupLogs' => 'CLEANUP_LOGS', 'removeToBeDeletedUsers' => 'REMOVE_TO_BE_DELETED_USERS'];
+    const RECURRING_TASKS_TIMEFRAMES = ['cleanupLogs' => '1', 'removeToBeDeletedUsers' => '1'];
+    const RECURRING_TASKS_UNITS = ['cleanupLogs' => 'WEEKS', 'removeToBeDeletedUsers' => 'WEEKS'];
 
     // enum constants
     const USER_ROLES = ['admin' => 'ADMIN', 'user' => 'USER', 'notActivated' => 'NOT_ACTIVATED', 'blocked' => 'BLOCKED', 'toBeDeleted' => 'TO_BE_DELETED'];
+    const ARTICLE_STATUS = ['active' => 'ACTIVE', 'expired' => 'EXPIRED', 'toBeDeleted' => 'TO_BE_DELETED'];
     
     // email
     const EMAIL_USER_DOMAIN = '@student.uni-tuebingen.de';

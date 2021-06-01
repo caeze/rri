@@ -29,7 +29,7 @@ class Header {
                     <div id="container">
                         <div id="header">
                             <div id="headerLogo">
-                                <a href="lectures.php">
+                                <a href="articles.php">
                                     <img src="static/img/fsiLogo.png" style="height: 30px;" alt="fsi logo">
                                 </a>
                             </div>

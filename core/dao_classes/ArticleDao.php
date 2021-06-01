@@ -1,9 +1,11 @@
 <?php
 class ArticleDao {
     private $dbConn = null;
+    private $dateUtil = null;
 
-    function __construct($dbConn) {
+    function __construct($dbConn, $dateUtil) {
         $this->dbConn = $dbConn;
+        $this->dateUtil = $dateUtil;
     }
     
     /**
@@ -72,7 +74,7 @@ class ArticleDao {
         $ID = $data['ID'];
         $status = $data['status'];
         $addedByUserID = $data['addedByUserID'];
-        $addedDate = $data['addedDate'];
+        $addedDate = $this->dateUtil->stringToDateTime($data['addedDate']);
         $remark = $data['remark'];
         $title = $data['title'];
         $pictureFileName1 = $data['pictureFileName1'];
@@ -81,7 +83,7 @@ class ArticleDao {
         $pictureFileName4 = $data['pictureFileName4'];
         $pictureFileName5 = $data['pictureFileName5'];
         $startingPrice = $data['startingPrice'];
-        $expiresOnDate = $data['expiresOnDate'];
+        $expiresOnDate = $this->dateUtil->stringToDateTime($data['expiresOnDate']);
         $description = $data['description'];
         $biddings = $data['biddings'];
         return new Article($ID, $status, $addedByUserID, $addedDate, $remark, $title, $pictureFileName1, $pictureFileName2, $pictureFileName3, $pictureFileName4, $pictureFileName5, $startingPrice, $expiresOnDate, $description, $biddings);
@@ -94,7 +96,7 @@ class ArticleDao {
         $ID = $data['ID'];
         $articleID = $data['articleID'];
         $biddingUserID = $data['biddingUserID'];
-        $date = $data['date'];
+        $date = $this->dateUtil->stringToDateTime($data['date']);
         $amount = $data['amount'];
         return new Bidding($ID, $articleID, $biddingUserID, $date, $amount);
     }
@@ -105,8 +107,8 @@ class ArticleDao {
      * If the operation was not successful, FALSE will be returned.
      */
     function addArticle($article) {
-        $sql = "INSERT INTO \"Articles\" (\"status\", \"addedByUserID\", \"addedDate\", \"remark\", \"title\", \"pictureFileName1\", \"pictureFileName2\", \"pictureFileName3\", \"pictureFileName4\", \"pictureFileName5\", \"startingPrice\", \"expiresOnDate\", \"description\", \"biddings\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $result = $this->dbConn->exec($sql, [$article->getStatus(), $article->getAddedByUserID(), $article->getAddedDate(), $article->getRemark(), $article->getTitle(), $article->getPictureFileName1(), $article->getPictureFileName2(), $article->getPictureFileName3(), $article->getPictureFileName4(), $article->getPictureFileName5(), $article->getStartingPrice(), $article->getExpiresOnDate(), $article->getDescription(), $article->getBiddings()]);
+        $sql = "INSERT INTO \"Articles\" (\"status\", \"addedByUserID\", \"addedDate\", \"remark\", \"title\", \"pictureFileName1\", \"pictureFileName2\", \"pictureFileName3\", \"pictureFileName4\", \"pictureFileName5\", \"startingPrice\", \"expiresOnDate\", \"description\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $result = $this->dbConn->exec($sql, [$article->getStatus(), $article->getAddedByUserID(), $this->dateUtil->dateTimeToString($article->getAddedDate()), $article->getRemark(), $article->getTitle(), $article->getPictureFileName1(), $article->getPictureFileName2(), $article->getPictureFileName3(), $article->getPictureFileName4(), $article->getPictureFileName5(), $article->getStartingPrice(), $this->dateUtil->dateTimeToString($article->getExpiresOnDate()), $article->getDescription()]);
         $id = $result['lastInsertId'];
         if ($id < 1) {
             return false;
@@ -117,8 +119,8 @@ class ArticleDao {
         for ($i = 0; $i < count($article->getBiddings()); $i++) {
             $bidding = $article->getBiddings()[$i];
             $bidding->setArticleID($article->getID());
-            $sql = "INSERT INTO \"Biddings\" (\"articleID\", \"biddingUserID\", \"date\", \"amount\") VALUES (?, ?)";
-            $result = $this->dbConn->exec($sql, [$bidding->getArticleID(), $bidding->getBiddingUserID(), $bidding->getDate(), $bidding->getAmount()]);
+            $sql = "INSERT INTO \"Biddings\" (\"articleID\", \"biddingUserID\", \"date\", \"amount\") VALUES (?, ?, ?, ?)";
+            $result = $this->dbConn->exec($sql, [$bidding->getArticleID(), $bidding->getBiddingUserID(), $this->dateUtil->dateTimeToString($bidding->getDate()), $bidding->getAmount()]);
             $id = $result['lastInsertId'];
             if ($id < 1) {
                 return false;
@@ -133,8 +135,8 @@ class ArticleDao {
      * Returns TRUE if the transaction was successful, FALSE otherwise.
      */
     function updateArticle($article) {
-        $sql = "UPDATE \"Articles\" SET \"status\"=?, \"addedByUserID\"=?, \"addedDate\"=?, \"remark\"=?, \"title\"=?, \"pictureFileName1\"=?, \"pictureFileName2\"=?, \"pictureFileName3\"=?, \"pictureFileName4\"=?, \"pictureFileName5\"=?, \"startingPrice\"=?, \"expiresOnDate\"=?, \"description\"=?, \"biddings\"=? WHERE \"ID\"=?;";
-        $result = $this->dbConn->exec($sql, [$article->getStatus(), $article->getAddedByUserID(), $article->getAddedDate(), $article->getRemark(), $article->getTitle(), $article->getPictureFileName1(), $article->getPictureFileName2(), $article->getPictureFileName3(), $article->getPictureFileName4(), $article->getPictureFileName5(), $article->getStartingPrice(), $article->getExpiresOnDate(), $article->getDescription(), $article->getBiddings()]);
+        $sql = "UPDATE \"Articles\" SET \"status\"=?, \"addedByUserID\"=?, \"addedDate\"=?, \"remark\"=?, \"title\"=?, \"pictureFileName1\"=?, \"pictureFileName2\"=?, \"pictureFileName3\"=?, \"pictureFileName4\"=?, \"pictureFileName5\"=?, \"startingPrice\"=?, \"expiresOnDate\"=?, \"description\"=? WHERE \"ID\"=?;";
+        $result = $this->dbConn->exec($sql, [$article->getStatus(), $article->getAddedByUserID(), $this->dateUtil->dateTimeToString($article->getAddedDate()), $article->getRemark(), $article->getTitle(), $article->getPictureFileName1(), $article->getPictureFileName2(), $article->getPictureFileName3(), $article->getPictureFileName4(), $article->getPictureFileName5(), $article->getStartingPrice(), $this->dateUtil->dateTimeToString($article->getExpiresOnDate()), $article->getDescription(), $article->getID()]);
         $rowCount = $result['rowCount'];
         if ($rowCount <= 0) {
             return false;
@@ -146,8 +148,8 @@ class ArticleDao {
         for ($i = 0; $i < count($article->getBiddings()); $i++) {
             $bidding = $article->getBiddings()[$i];
             $bidding->setArticleID($article->getID());
-            $sql = "INSERT INTO \"Biddings\" (\"articleID\", \"biddingUserID\", \"date\", \"amount\") VALUES (?, ?)";
-            $result = $this->dbConn->exec($sql, [$bidding->getArticleID(), $bidding->getBiddingUserID(), $bidding->getDate(), $bidding->getAmount()]);
+            $sql = "INSERT INTO \"Biddings\" (\"articleID\", \"biddingUserID\", \"date\", \"amount\") VALUES (?, ?, ?, ?)";
+            $result = $this->dbConn->exec($sql, [$bidding->getArticleID(), $bidding->getBiddingUserID(), $this->dateUtil->dateTimeToString($bidding->getDate()), $bidding->getAmount()]);
             $id = $result['lastInsertId'];
             if ($id < 1) {
                 return false;

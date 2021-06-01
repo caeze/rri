@@ -10,12 +10,12 @@
         $reportArticleID = filter_input(INPUT_GET, 'report', FILTER_SANITIZE_ENCODED);
         if (isset($_GET['report'])) {
             if (is_numeric($reportArticleID)) {
-                $reportingResult = $articleSystem->reportArticleHasOutdatedProtocols($reportArticleID, $currentUser->getUsername());
+                $reportingResult = $articleSystem->reportArticleAsOutdated($reportArticleID, $currentUser->getUsername());
                 if ($reportingResult == true) {
                     $log->info('articles.php', 'Successfully reported the article as outdated.');
                 }
             } else {
-                $log->error('articles.php', 'Article ID is not numeric: ' . $borrowArticleID);
+                $log->error('articles.php', 'Article ID is not numeric: ' . $reportArticleID);
             }
         }
     }
@@ -26,22 +26,22 @@
 
     echo '<div id="protocolsTable" style="padding-left: 40px; padding-bottom: 40px; padding-right: 40px; margin: 0px;">';
 
-    $headers = array($i18n->get('articleTitle'), $i18n->get('currentBidding'), $i18n->get('expiresOnDate'), $i18n->get('bid'), $i18n->get('report'));
-    $widths = array(60, 10, 10, 10, 10);
-    $textAlignments = array('left', 'center', 'center', 'center', 'center');
+    $headers = array($i18n->get('articleTitle'), $i18n->get('currentBidding'), $i18n->get('uploadedOnDate'), $i18n->get('expiresOnDate'), $i18n->get('viewAndBid'), $i18n->get('report'));
+    $widths = array(50, 10, 10, 10, 10, 10);
+    $textAlignments = array('left', 'center', 'center', 'center', 'center', 'center');
     
     $allArticles = $articleSystem->getAllArticles();
-    // sort list of articles by name
-    usort($allArticles, function($a, $b) {
-        return strcmp($a->getName(), $b->getName());
-    });
+    $allArticles = array_reverse($allArticles);
     
-    function getHighestBidding($listOfBiddings) {
+    function getHighestBidding($article, $currencyUtil) {
         $highestValue = 0;
-        foreach ($listOfBiddings as &$bidding) {
+        foreach ($article->getBiddings() as &$bidding) {
             $highestValue = max($highestValue, $bidding->getAmount());
         }
-        return $highestValue;
+        if ($highestValue == 0) {
+            $highestValue = $article->getStartingPrice();
+        }
+        return $currencyUtil->formatCentsToCurrency(intval($highestValue));
     }
     
     $data = array();
@@ -49,9 +49,10 @@
     foreach ($allArticles as &$article) {
         $row = array();
         $row[] = $article->getTitle();
-        $row[] = $currencyUtil->formatCentsToCurrency(getHighestBidding($article->getBiddings()));
-        $row[] = $article->getExpiresOnDate();
-        $row[] = '<a id="styledButton" href="?borrow=' . $article->getID() . '"><nobr><img src="static/img/bid.png" style="height: 24px; vertical-align: middle;">&nbsp;&nbsp;' . $i18n->get('bid') . '</nobr></a>';
+        $row[] = getHighestBidding($article, $currencyUtil);
+        $row[] = $dateUtil->dateTimeToStringForDisplaying($article->getAddedDate(), $currentUser->getLanguage());
+        $row[] = $dateUtil->dateTimeToStringForDisplaying($article->getExpiresOnDate(), $currentUser->getLanguage());
+        $row[] = '<a id="styledButton" href="bid.php?id=' . $article->getID() . '"><nobr><img src="static/img/bid.png" style="height: 24px; vertical-align: middle;">&nbsp;&nbsp;' . $i18n->get('viewAndBid') . '</nobr></a>';
         $reportingPossible = true;
         if (isset($_GET['report'])) {
             if (is_numeric($reportArticleID)) {

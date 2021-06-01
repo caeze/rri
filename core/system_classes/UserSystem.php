@@ -176,42 +176,6 @@ class UserSystem {
     }
     
     /**
-     * Adds the given number of tokens to the user and saves this to the database.
-     * Can also be used to subtract tokens from a user.
-     * Returns TRUE if the task was successful, FALSE otherwise.
-     */
-    function addTokensToUser($username, $numberOfTokens) {
-        $user = $this->userDao->getUserByUsername($username);
-        if ($user != NULL) {
-            $newTokens = $user->getTokens() + $numberOfTokens;
-            if ($newTokens < 0) {
-                $newTokens = 0;
-            }
-            $newTokens = intval($newTokens);
-            $user->setTokens($newTokens);
-            return $this->userDao->updateUser($user);
-        } else {
-            $this->log->error(static::class . '.php', 'Error on adding tokens to the currently logged in user!');
-        }
-        return false;
-    }
-    
-    /**
-     * Sends an email to the admin because a user asks for more tokens.
-     * Returns TRUE if the task was successful, FALSE otherwise.
-     */
-    function askTokens($message) {
-        $user = $this->getLoggedInUser();
-        if ($user != NULL) {
-            $messageFull = $this->i18n->getWithValues('userAsksForTokensMessage', [$this->urlUtil->getCurrentDirname() . 'asktokens.php?username=' . $user->getUsername(), $message]);
-            return $this->email->send(Constants::EMAIL_ADMIN, $this->i18n->get('userAsksForTokens'), $messageFull);
-        } else {
-            $this->log->error(static::class . '.php', 'Error on asking for tokens by the currently logged in user!');
-        }
-        return false;
-    }
-    
-    /**
      * Activates the given user. Returns the user if the task was successful, FALSE otherwise.
      */
     function activateUser($username, $key) {
@@ -222,7 +186,6 @@ class UserSystem {
             }
             $user->setRole(Constants::USER_ROLES['user']);
             $user->setStatus('');
-            $user->setTokens(Constants::START_BALANCE);
             $result = $this->userDao->updateUser($user);
             if ($result == false) {
                 $this->log->error(static::class . '.php', 'Error on activating the user ' . $username . '!');
@@ -258,34 +221,10 @@ class UserSystem {
     }
     
     /**
-     * Lets the given user borrow the given lecture.
-     * Returns TRUE if the transaction was successful, FALSE otherwise.
-     */
-    function borrowLecture($user, $lectureID) {
-        $borrowRecords = $user->getBorrowRecords();
-        
-        $borrowedLectureIDs = array();
-        for ($i = 0; $i < count($borrowRecords); $i++) {
-            $borrowedLectureIDs[] = $borrowRecords[$i]->getLectureID();
-        }
-        
-        if ($user->getTokens() > 0 && !in_array($lectureID, $borrowedLectureIDs)) {
-            $now = $this->dateUtil->getDateTimeNow();
-            $borrowedUntil = $this->dateUtil->addToDateTime($now, Constants::EXAM_PROTOCOL_BORROWED_TIMEFRAME, Constants::EXAM_PROTOCOL_BORROWED_UNIT);
-            $borrowRecords[] = new BorrowRecord(NULL, $lectureID, $user->getID(), $borrowedUntil);
-            $user->setBorrowRecords($borrowRecords);
-            $tokens = $user->getTokens() - 1;
-            $user->setTokens($tokens);
-            return $this->userDao->updateUser($user);
-        }
-        return false;
-    }
-    
-    /**
      * Updates the user data in the database.
      * Returns TRUE if the transaction was successful, FALSE otherwise.
      */
-    function updateUser($userID, $passwordHash, $role, $status, $tokens, $lastLoggedIn, $language, $comment) {
+    function updateUser($userID, $passwordHash, $role, $status, $lastLoggedIn, $language, $comment) {
         $user = $this->userDao->getUser($userID);
         if ($user == NULL) {
             $this->log->error(static::class . '.php', 'Error on getting the user with the user ID ' . $userID . '!');
@@ -294,23 +233,10 @@ class UserSystem {
         $user->setPasswordHash($passwordHash);
         $user->setRole($role);
         $user->setStatus($status);
-        $user->setTokens($tokens);
         $user->setLastLoggedIn($lastLoggedIn);
         $user->setLanguage($language);
         $user->setComment($comment);
         return $this->userDao->updateUser($user);
-    }
-    
-    /**
-     * Sends a reply mail to the given user. Also grants the given tokens to the given user.
-     * Returns TRUE if the action was successful, FALSE otherwise.
-     */
-    function grantTokensAndMailToUploader($uploadedByUsername, $tokensToAdd, $reply) {
-        if ($reply != '') {
-            $messageFull = $this->i18n->getWithValues('uploadFeedbackMailMessage', [$uploadedByUsername, $reply]);
-            $this->email->send($uploadedByUsername . Constants::EMAIL_USER_DOMAIN, $this->i18n->get('uploadedExamProtocolSubject'), $messageFull);
-        }
-        return $this->addTokensToUser($uploadedByUsername, $tokensToAdd);
     }
 }
 ?>

@@ -76,69 +76,11 @@ class RecurringTasksSystem {
         $result = 'SUCCESS';
         
         // run recurring tasks
-        if ($taskName == Constants::RECURRING_TASKS['cleanDownloadsDirectory']) {
-            $ppiRootDirectory = $this->fileUtil->getFullPathToBaseDirectory();
-            $files = glob($ppiRootDirectory . Constants::TMP_ZIP_FILES_DIRECTORY . '/*');
-            foreach ($files as $file) {
-                if (is_file($file)) {
-                    if ($this->fileUtil->strEndsWith($file, Constants::ALLOWED_FILE_EXTENSION_DOWNLOAD[0])) {
-                        unlink($file);
-                    } else {
-                        $retVal = 'WRONG_FILE_EXTENSION';
-                        $this->log->error(static::class . '.php', 'Recurring task did not run successfully! Can not delete file that is not a zip file: ' . $file);
-                        return $retVal;
-                    }
-                }
-            }
-        }
-        if ($taskName == Constants::RECURRING_TASKS['removeExpiredBorrowRecords']) {
-            $result = $this->recurringTasksDao->removeExpiredBorrowRecords();
-        }
         if ($taskName == Constants::RECURRING_TASKS['cleanupLogs']) {
             $result = $this->recurringTasksDao->cleanupLogs();
         }
-        if ($taskName == Constants::RECURRING_TASKS['removeToBeDeletedProtocols']) {
-            $toBeDeleted = $this->examProtocolSystem->getAllExamProtocolsWithStatus(Constants::EXAM_PROTOCOL_STATUS['toBeDeleted']);
-            foreach ($toBeDeleted as $examProtocol) {
-                $file = $this->fileUtil->getFullPathToBaseDirectory() . Constants::UPLOADED_PROTOCOLS_DIRECTORY . '/' . $examProtocol->getFileName();
-                if (is_file($file)) {
-                    if ($this->fileUtil->strEndsWith($file, Constants::ALLOWED_FILE_EXTENSION_DOWNLOAD[0])) {
-                        unlink($file);
-                    } else {
-                        $retVal = 'WRONG_FILE_EXTENSION';
-                        $this->log->error(static::class . '.php', 'Recurring task did not run successfully! Can not delete file that is not a pdf or txt file: ' . $file);
-                        return $retVal;
-                    }
-                }
-                $result = $this->recurringTasksDao->removeProtocolAssignmentsToLectures($examProtocol->getID());
-                if ($result == 'ERROR') {
-                    $this->log->error(static::class . '.php', 'Error while running recurring task: ' . $taskName);
-                    $retVal = 'ERROR';
-                    return $retVal;
-                }
-            }
-            $result = $this->recurringTasksDao->removeToBeDeletedProtocols();
-        }
         if ($taskName == Constants::RECURRING_TASKS['removeToBeDeletedUsers']) {
             $result = $this->recurringTasksDao->removeToBeDeletedUsers();
-        }
-        if ($taskName == Constants::RECURRING_TASKS['removeToBeDeletedLectures']) {
-            // mark the protocols that were only assigned to this very lecture as 'to be deleted'
-            $toBeDeletedLectures = $this->lectureSystem->getAllLecturesWithStatus(Constants::LECTURE_STATUS['toBeDeleted']);
-            foreach ($toBeDeletedLectures as $lecture) {
-                foreach ($lecture->getAssignedExamProtocols() as $examProtocolAssignedToLecture) {
-                    $examProtocolID = $examProtocolAssignedToLecture->getExamProtocolID();
-                    $lectureIDsOfExamProtocol = $this->examProtocolSystem->getLectureIDsOfExamProtocol($examProtocolID);
-                    if(count($lectureIDsOfExamProtocol) == 1) {
-                        $this->examProtocolSystem->updateExamProtocolStatus($examProtocolID, Constants::EXAM_PROTOCOL_STATUS['toBeDeleted']);
-                    }
-                }
-            }
-            // then remove the lecture
-            $result = $this->recurringTasksDao->removeToBeDeletedLectures();
-        }
-        if ($taskName == Constants::RECURRING_TASKS['addTokensToAllUsers']) {
-            $result = $this->recurringTasksDao->addTokensToAllUsers(Constants::NUMBER_OF_TOKENS_TO_ADD_TO_ALL_PER_SEMESTER);
         }
         
         // handle results of recurring task run

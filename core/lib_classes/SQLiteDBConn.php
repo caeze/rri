@@ -1,14 +1,11 @@
 <?php
 class DBConn {
-    // postgres installation hints
-    // https://www.howtoforge.de/anleitung/wie-man-postgresql-und-phppgadmin-auf-ubuntu-1804-lts-installiert/
-    
     private $pdo = null;
     private $mode = null; // can be 'INDICES', 'COLUMN_NAMES' or 'BOTH'
     private $log = null;
 
     function __construct($host, $port, $databaseName, $user, $password, $mode) {
-        $dsn = 'pgsql:host=' . $host . ';port=' . $port . ';dbname=' . $databaseName . ';user=' . $user . ';password=' . $password;
+        $dsn = 'sqlite:rridb.sqlite3';
         try {
             $this->pdo = new PDO($dsn);
             if (!$this->pdo){
@@ -65,6 +62,9 @@ class DBConn {
                                     ARRAY_FILTER_USE_KEY
                                 );
                 $retArray[] = $f;
+            }
+            if (isset($retArray[0]['COUNT(*)'])) {
+                $retArray[0]["count"] = $retArray[0]['COUNT(*)'];
             }
             return $retArray;
         }

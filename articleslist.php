@@ -2,36 +2,42 @@
     require_once('core/Main.php');
     
     if (!$userSystem->isLoggedIn()) {
-        $log->info('userslist.php', 'User was not logged in');
+        $log->info('articleslist.php', 'User was not logged in');
         $redirect->redirectTo('login.php');
     }
     if ($currentUser->getRole() != Constants::USER_ROLES['admin']) {
-        $log->error('userslist.php', 'User was not admin');
+        $log->error('articleslist.php', 'User was not admin');
         $redirect->redirectTo('articles.php');
     }
     
     $postStatus = NULL;
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $passwordHash = filter_input(INPUT_POST, 'passwordHash', FILTER_SANITIZE_SPECIAL_CHARS);
-        $role = filter_input(INPUT_POST, 'role', FILTER_SANITIZE_ENCODED);
         $status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_ENCODED);
-        $lastLoggedIn = filter_input(INPUT_POST, 'lastLoggedIn', FILTER_SANITIZE_ENCODED);
-        $language = filter_input(INPUT_POST, 'language', FILTER_SANITIZE_ENCODED);
-        $comment = filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_ENCODED);
-        $userID = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_ENCODED);
+        $addedByUserID = filter_input(INPUT_POST, 'addedByUserID', FILTER_SANITIZE_ENCODED);
+        $addedDate = filter_input(INPUT_POST, 'addedDate', FILTER_SANITIZE_SPECIAL_CHARS);
+        $remark = filter_input(INPUT_POST, 'remark', FILTER_SANITIZE_SPECIAL_CHARS);
+        $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_SPECIAL_CHARS);
+        $pictureFileName1 = filter_input(INPUT_POST, 'pictureFileName1', FILTER_SANITIZE_SPECIAL_CHARS);
+        $pictureFileName2 = filter_input(INPUT_POST, 'pictureFileName2', FILTER_SANITIZE_SPECIAL_CHARS);
+        $pictureFileName3 = filter_input(INPUT_POST, 'pictureFileName3', FILTER_SANITIZE_SPECIAL_CHARS);
+        $pictureFileName4 = filter_input(INPUT_POST, 'pictureFileName4', FILTER_SANITIZE_SPECIAL_CHARS);
+        $pictureFileName5 = filter_input(INPUT_POST, 'pictureFileName5', FILTER_SANITIZE_SPECIAL_CHARS);
+        $startingPrice = filter_input(INPUT_POST, 'startingPrice', FILTER_SANITIZE_ENCODED);
+        $expiresOnDate = filter_input(INPUT_POST, 'expiresOnDate', FILTER_SANITIZE_SPECIAL_CHARS);
+        $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_SPECIAL_CHARS);
         
-        if ($passwordHash != '' && $role != '' && $language != '' && is_numeric($userID)) {
-            $result = $userSystem->updateUser($userID, $passwordHash, $role, $status, $lastLoggedIn, $language, $comment);
+        if ($status != '' && $addedByUserID != '' && $addedDate != '' && $title != '' && $pictureFileName1 != '' && $startingPrice != '' && $expiresOnDate != '' && $description != '' && is_numeric($addedByUserID) && is_numeric($startingPrice)) {
+            $result = $articleSystem->updateArticleFully($articleID, $status, $addedByUserID, $addedDate, $remark, $title, $pictureFileName1, $pictureFileName2, $pictureFileName3, $pictureFileName4, $pictureFileName5, $startingPrice, $expiresOnDate, $description, $biddings);
             if ($result) {
-                $postStatus = 'UPDATED_USER_DATA';
-                $log->debug('userslist.php', 'Successfully updated user data');
+                $postStatus = 'UPDATED_ARTICLE_DATA';
+                $log->debug('articleslist.php', 'Successfully updated article data');
             } else {
-                $postStatus = 'ERROR_ON_UPDATING_USER_DATA';
-                $log->debug('userslist.php', 'Error on updating user data');
+                $postStatus = 'ERROR_ON_UPDATING_ARTICLE_DATA';
+                $log->debug('articleslist.php', 'Error on updating article data');
             }
         } else {
-            $postStatus = 'ERROR_ON_UPDATING_USER_DATA';
-            $log->debug('userslist.php', 'Missing on updating user data');
+            $postStatus = 'ERROR_ON_UPDATING_ARTICLE_DATA';
+            $log->debug('articleslist.php', 'Missing on updating article data');
         }
     }
     
@@ -50,14 +56,14 @@
             $page = intval($pageValue);
         } else {
             if ($pageValue != '') {
-                $log->debug('userslist.php', 'Page value is not numeric: ' . $pageValue);
+                $log->debug('articleslist.php', 'Page value is not numeric: ' . $pageValue);
             }
         }
         if (isset($_GET['userID'])) {
             if (is_numeric($userIDValue)) {
                 $userID = intval($userIDValue);
             } else {
-                $log->info('userslist.php', 'User ID value is not numeric: ' . $userIDValue);
+                $log->info('articleslist.php', 'User ID value is not numeric: ' . $userIDValue);
             }
         }
         if (isset($_GET['role']) || isset($_GET['username']) || isset($_GET['userID'])) {
@@ -71,40 +77,40 @@
                         $result = $userSystem->updateUser($deleteID, $user->getPasswordHash(), 'TO_BE_DELETED', $user->getStatus(), $user->getlastLoggedIn(), $user->getLanguage(), $user->getComment());
                         if (!$result) {
                             $postStatus = 'ERROR_ON_UPDATING_USER_DATA';
-                            $log->error('userslist.php', 'User could not be marked for deletion with user ID: ' . $deleteID);
+                            $log->error('articleslist.php', 'User could not be marked for deletion with user ID: ' . $deleteID);
                         }
                     } else {
                         $postStatus = 'ERROR_ON_UPDATING_USER_DATA';
-                        $log->error('userslist.php', 'User ID to be deleted not found: ' . $deleteID);
+                        $log->error('articleslist.php', 'User ID to be deleted not found: ' . $deleteID);
                     }
                 } else {
                     $postStatus = 'ERROR_ON_UPDATING_USER_DATA';
-                    $log->error('userslist.php', 'Can not delete the admin user with ID 1');
+                    $log->error('articleslist.php', 'Can not delete the admin user with ID 1');
                 }
             } else {
                 $postStatus = 'ERROR_ON_UPDATING_USER_DATA';
-                $log->error('userslist.php', 'ID of user to be deleted is not numeric: ' . $deleteID);
+                $log->error('articleslist.php', 'ID of user to be deleted is not numeric: ' . $deleteID);
             }
         }
     }
     
-    echo $header->getHeader($i18n->get('title'), $i18n->get('allUsers'), array('protocols.css', 'button.css'));
+    echo $header->getHeader($i18n->get('title'), $i18n->get('allArticles'), array('upload.css', 'button.css'));
     
     echo $mainMenu->getMainMenu($i18n, $currentUser);
     
     $passwordExample = $hashUtil->generateRandomString();
     
-    echo '<center>
+    /*echo '<center>
                 <details' . $open . '>
                     <summary id="styledButton" style="line-height: 10px; margin: 5px;">' . $i18n->get('filter') . '</summary>
                     <div style="width: 15%; display: inline-block; text-align: left; margin: 0px;">
-                        <form action="userslist.php" method="GET">
+                        <form action="articleslist.php" method="GET">
                             <input type="text" size="8" name="username" placeholder="' . $i18n->get('username') . '">
                             <input type="submit" value="' . $i18n->get('ok') . '">
                         </form>
                     </div>
                     <div style="width: 15%; display: inline-block; text-align: left; margin: 0px;">
-                        <form action="userslist.php" method="GET">
+                        <form action="articleslist.php" method="GET">
                             <input type="text" size="8" name="userID" placeholder="' . $i18n->get('user') . ' ' . $i18n->get('ID') . '">
                             <input type="submit" value="' . $i18n->get('ok') . '">
                         </form>
@@ -121,7 +127,7 @@
                         <br><center>' . $i18n->get('passwordExample') . ': ' . $passwordExample . ', ' . $i18n->get('hash') . ': ' . $hashUtil->hashPasswordWithSaltIncluded($passwordExample) . '</center><br>
                     </div>
                 </details>
-            </center>';
+            </center>';*/
 
     if ($postStatus == 'UPDATED_USER_DATA') {
         echo '<br><center>' . $i18n->get('updatedUserDataSuccessfully') . '</center><br>';
@@ -148,7 +154,7 @@
     
     $allUsers = $userSystem->getUsers(Constants::NUMBER_OF_ENTRIES_PER_PAGE, $page, $role, $username, $userID);
     foreach ($allUsers as &$user) {
-        echo '<form method="POST" action="userslist.php">';
+        echo '<form method="POST" action="articleslist.php">';
         echo '<div style="width: 5%; display: inline-block; text-align: center;">' . $user->getID() . '</div>';
         echo '<div style="width: 10%; display: inline-block;">' . '<input type="text" readonly name="username" value="' . $user->getUsername() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
         echo '<div style="width: 10%; display: inline-block;">' . '<input type="text" name="passwordHash" value="' . $user->getPasswordHash() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
@@ -159,7 +165,7 @@
         echo '<div style="width: 20%; display: inline-block;">' . '<input type="text" name="comment" value="' . $user->getComment() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
         echo '<div style="width: 15%; display: inline-block; text-align: center;">
                     <a href="?deleteID=' . $user->getID() . '" id="styledButtonRed">
-                        <img src="static/img/delete.png" alt="view protocol" style="height: 24px; vertical-align: middle;">
+                        <img src="static/img/delete.png" alt="delete" style="height: 24px; vertical-align: middle;">
                     </a>
                 </div>';
         echo '<div style="width: 10%; display: inline-block; text-align: center;">' . 

@@ -66,7 +66,7 @@ class DBConnDatabaseUtility {
     }
 
     /**
-     * Set up the empty exam protocols table.
+     * Set up the empty articles table.
      */
     function setUpEmptyArticlesTable() {
         $sql = 'CREATE TABLE "Articles" (
@@ -89,7 +89,7 @@ class DBConnDatabaseUtility {
     }
 
     /**
-     * Set up the empty lectures table.
+     * Set up the empty biddings table.
      */
     function setUpEmptyBiddingsTable() {
         $sql = 'CREATE TABLE "Biddings" (

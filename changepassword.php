@@ -57,7 +57,7 @@
         if ($changed) {
             $typePassword = 'hidden';
             $typeSubmit = 'hidden';
-            $backButton = '<center><a href="lectures.php" id="styledButton">' .  $i18n->get('back') . '</a></center>';
+            $backButton = '<center><a href="articles.php" id="styledButton">' .  $i18n->get('back') . '</a></center>';
         }
         return '<div id="loginField">
                     <center><div id="rriLogo"><img src="static/img/rriLogo.png" style="height: 55px;" alt="rri logo"></div></center>

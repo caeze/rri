@@ -88,7 +88,7 @@
         }
     }
     
-    echo $header->getHeader($i18n->get('title'), $i18n->get('allUsers'), array('protocols.css', 'button.css'));
+    echo $header->getHeader($i18n->get('title'), $i18n->get('allUsers'), array('button.css'));
     
     echo $mainMenu->getMainMenu($i18n, $currentUser);
     
@@ -159,7 +159,7 @@
         echo '<div style="width: 20%; display: inline-block;">' . '<input type="text" name="comment" value="' . $user->getComment() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
         echo '<div style="width: 15%; display: inline-block; text-align: center;">
                     <a href="?deleteID=' . $user->getID() . '" id="styledButtonRed">
-                        <img src="static/img/delete.png" alt="view protocol" style="height: 24px; vertical-align: middle;">
+                        <img src="static/img/delete.png" alt="delete user" style="height: 24px; vertical-align: middle;">
                     </a>
                 </div>';
         echo '<div style="width: 10%; display: inline-block; text-align: center;">' . 

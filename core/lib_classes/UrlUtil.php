@@ -53,21 +53,21 @@ class UrlUtil {
     }
     
     /**
-     * Get the current location (e.g. 'http://localhost/ppi').
+     * Get the current location (e.g. 'http://localhost/rri').
      */
     function getCurrentDirname() {
         return $this->getCurrentPageUrlInfo()['dirname'] . $this->slashAtEnd;
     }
     
     /**
-     * Get the current URL (e.g. 'http://localhost/ppi/recurringtasks.php').
+     * Get the current URL (e.g. 'http://localhost/rri/recurringtasks.php').
      */
     function getCurrentUrl() {
         return $this->getCurrentPageUrlInfo()['currentUrl'];
     }
     
     /**
-     * Get the current URL with the GET params (e.g. 'http://localhost/ppi/recurringtasks.php?a=5&b=6').
+     * Get the current URL with the GET params (e.g. 'http://localhost/rri/recurringtasks.php?a=5&b=6').
      */
     function getCurrentUrlWithGetParams() {
         return $this->getCurrentPageUrlInfo()['currentUrlWithGetParams'];

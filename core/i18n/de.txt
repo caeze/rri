@@ -68,6 +68,7 @@ examProtocolsList=Protokollliste
 examiners=Prüfer:innen
 examprotocolslistHelp=Hilfe für Protokollliste (für Admins)
 examprotocolslistHelpContent=
+expiredArticlesFoundPleaseCheckBackWithHighestBidders=Hallo Admin,<br><br>ausgelaufene Auktionen wurden im System gefunden. Bitte melde dich bei den höchsten Bieter:innen!<br><br>Folgende Artikel sind betroffen:<br><br>{0}<br><br>Viele Grüße,<br>Dein RRI
 failedAddingTokensToUser=Fehler bei der Zuweisung der Tokens an den:die Nutzer:in
 faq=FAQ
 faqHelpContent=

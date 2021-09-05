@@ -42,7 +42,7 @@ class LogEventSystem {
         }
 
         if ($level >= Constants::ALERT_ADMIN_FROM_LEVEL) {
-            $this->email->send(Constants::EMAIL_ADMIN, 'Error occured in PPI', $logMessage);
+            $this->email->send(Constants::EMAIL_ADMIN, 'Error occured in RRI', $logMessage);
         }
     }
     

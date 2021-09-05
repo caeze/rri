@@ -20,11 +20,11 @@
         }
     }
 
-    echo $header->getHeader($i18n->get('title'), $i18n->get('showArticles'), array('protocols.css', 'button.css', 'searchableTable.css'));
+    echo $header->getHeader($i18n->get('title'), $i18n->get('showArticles'), array('upload.css', 'button.css', 'searchableTable.css'));
     
     echo $mainMenu->getMainMenu($i18n, $currentUser);
 
-    echo '<div id="protocolsTable" style="padding-left: 40px; padding-bottom: 40px; padding-right: 40px; margin: 0px;">';
+    echo '<div id="articlesTable" style="padding-left: 40px; padding-bottom: 40px; padding-right: 40px; margin: 0px;">';
 
     $headers = array($i18n->get('articleTitle'), $i18n->get('currentBidding'), $i18n->get('uploadedOnDate'), $i18n->get('expiresOnDate'), $i18n->get('viewAndBid'), $i18n->get('report'));
     $widths = array(50, 10, 10, 10, 10, 10);

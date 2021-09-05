@@ -68,6 +68,7 @@ examProtocolsList=List of Protocols
 examiners=Examiners
 examprotocolslistHelp=Help for the List of Exam Protocols (for Admins)
 examprotocolslistHelpContent=
+expiredArticlesFoundPleaseCheckBackWithHighestBidders=Hello Admin,<br><br>expired articles were found in the system. Please check back with the highest bidders!<br><br>The following articles are affected:<br><br>{0}Best,<br>Your RRI
 failedAddingTokensToUser=Failed to add tokens to user.
 faq=FAQ
 faqHelpContent=

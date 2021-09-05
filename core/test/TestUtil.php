@@ -30,7 +30,7 @@ class TestUtil {
     }
     
     function runAllTests() {
-        $this->databaseUtility = new PostgresDBConnDatabaseUtility($this->dbConn, $this->dateUtil);
+        $this->databaseUtility = new DBConnDatabaseUtility($this->dbConn, $this->dateUtil);
         $this->databaseUtility->recreateDatabase();
         
         $retArray = array();
@@ -52,10 +52,10 @@ class TestUtil {
     
     function runStaticCodeAnalysis() {
         require_once(__DIR__ . '/StaticCodeAnalysis.php');
-        $ppiRootDirectory = $this->fileUtil->getFullPathToBaseDirectory();
+        $rriRootDirectory = $this->fileUtil->getFullPathToBaseDirectory();
         $phpstanDirectory = __DIR__ . '/code_analysis/';
         $staticCodeAnalysis = new StaticCodeAnalysis($this->fileUtil);
-        $result = $staticCodeAnalysis->analyze($ppiRootDirectory, $phpstanDirectory);
+        $result = $staticCodeAnalysis->analyze($rriRootDirectory, $phpstanDirectory);
         if (strpos($result, '[OK]') !== false) {
             $result = '<div style="background-color: ' . Constants::SUCCESS_COLOR . '">' . $result . '<div>';
         } else {

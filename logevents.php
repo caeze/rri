@@ -26,7 +26,7 @@
         $level = filter_input(INPUT_GET, 'level', FILTER_SANITIZE_ENCODED);
     }
     
-    echo $header->getHeader($i18n->get('title'), $i18n->get('logEvents'), array('protocols.css', 'button.css'));
+    echo $header->getHeader($i18n->get('title'), $i18n->get('logEvents'), array('button.css'));
     
     echo $mainMenu->getMainMenu($i18n, $currentUser);
     
@@ -76,7 +76,7 @@
         } else if ($event->getLevel() == Constants::LOG_LEVELS[4]) {
             $color = 'background-color: red; ';
         }
-        echo '<form method="POST" action="examprotocolslist.php" style="' . $color . '">' .
+        echo '<form method="POST" action="logevents.php" style="' . $color . '">' .
              '<div style="width: 5%; display: inline-block; text-align: center;">' . $event->getID() . '</div>' .
              '<div style="width: 20%; display: inline-block;">' . $dateUtil->dateTimeToString($event->getDate()) . '</div>' .
              '<div style="width: 10%; display: inline-block;">' . $event->getUsername() . '</div>' .

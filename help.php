@@ -4,7 +4,7 @@
     echo $header->getHeader($i18n->get('title'), $i18n->get('help'), array('button.css'));
     
     $page = 'generic';
-    $return = 'lectures';
+    $return = 'articles';
 
     if (isset($_GET['page'])) {
         $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_ENCODED);

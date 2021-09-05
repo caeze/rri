@@ -1,15 +1,23 @@
 <?php
 class RecurringTasksSystem {
     private $recurringTasksDao = null;
+    private $articleSystem = null;
+    private $userSystem = null;
     private $dateUtil = null;
     private $fileUtil = null;
+    private $email = null;
+    private $i18n = null;
     private $log = null;
     private $lastResults = [];
 
-    function __construct($recurringTasksDao, $dateUtil, $fileUtil) {
+    function __construct($recurringTasksDao, $articleSystem, $userSystem, $dateUtil, $fileUtil, $email, $i18n) {
         $this->recurringTasksDao = $recurringTasksDao;
+        $this->articleSystem = $articleSystem;
+        $this->userSystem = $userSystem;
         $this->dateUtil = $dateUtil;
         $this->fileUtil = $fileUtil;
+        $this->email = $email;
+        $this->i18n = $i18n;
     }
 
     /**
@@ -81,6 +89,27 @@ class RecurringTasksSystem {
         }
         if ($taskName == Constants::RECURRING_TASKS['removeToBeDeletedUsers']) {
             $result = $this->recurringTasksDao->removeToBeDeletedUsers();
+        }
+        if ($taskName == Constants::RECURRING_TASKS['checkForExpiredBiddings']) {
+            $allExpiredArticles = $this->articleSystem->getAllArticlesThatAreExpired();
+            if (sizeof($allExpiredArticles) != 0) {
+                $expiredArticlesText = '';
+                foreach ($allExpiredArticles as $expiredArticle) {
+                    if ($expiredArticlesText != '') {
+                        $expiredArticlesText .= '<br>';
+                    }
+                    $expiredArticlesText .= $this->i18n->get('ID') . ': ' . $expiredArticle->getID() . ', ' . $this->i18n->get('articleTitle') . ': ' . $expiredArticle->getTitle();
+                }
+                $user = $this->userSystem->getLoggedInUser();
+                $mailResult = $this->email->send($user->getUsername() . Constants::EMAIL_USER_DOMAIN, $this->i18n->get('expiredArticlesFound'), $this->i18n->getWithValues('expiredArticlesFoundPleaseCheckBackWithHighestBidders', [$expiredArticlesText]));
+                if ($mailResult) {
+                    $result = 'SUCCESS';
+                } else {
+                    $result = 'ERROR';
+                }
+            } else {
+                $result = 'NO_CHANGE';
+            }
         }
         
         // handle results of recurring task run

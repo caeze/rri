@@ -43,9 +43,9 @@ class Constants {
     const LOCALE_GERMAN = ['currencyIsoCode' => 'EUR', 'currencySymbol' => '€', 'currencyExchangeRateToEuro' => 1, 'decimalSymbol' => ',', 'printCurrencySymbolAfterAmount' => true];
     
     // recurring tasks
-    const RECURRING_TASKS = ['cleanupLogs' => 'CLEANUP_LOGS', 'removeToBeDeletedUsers' => 'REMOVE_TO_BE_DELETED_USERS'];
-    const RECURRING_TASKS_TIMEFRAMES = ['cleanupLogs' => '1', 'removeToBeDeletedUsers' => '1'];
-    const RECURRING_TASKS_UNITS = ['cleanupLogs' => 'WEEKS', 'removeToBeDeletedUsers' => 'WEEKS'];
+    const RECURRING_TASKS = ['cleanupLogs' => 'CLEANUP_LOGS', 'removeToBeDeletedUsers' => 'REMOVE_TO_BE_DELETED_USERS', 'checkForExpiredBiddings' => 'CHECK_FOR_EXPIRED_BIDDINGS'];
+    const RECURRING_TASKS_TIMEFRAMES = ['cleanupLogs' => '1', 'removeToBeDeletedUsers' => '1', 'checkForExpiredBiddings' => '1'];
+    const RECURRING_TASKS_UNITS = ['cleanupLogs' => 'WEEKS', 'removeToBeDeletedUsers' => 'WEEKS', 'checkForExpiredBiddings' => 'DAYS'];
 
     // enum constants
     const USER_ROLES = ['admin' => 'ADMIN', 'user' => 'USER', 'notActivated' => 'NOT_ACTIVATED', 'blocked' => 'BLOCKED', 'toBeDeleted' => 'TO_BE_DELETED'];

@@ -1,6 +1,7 @@
 <?php
 class CurrencyUtil {
     private $locale;
+    private $log;
 
     function __construct() {
         $this->locale = Constants::LOCALE_GERMAN;

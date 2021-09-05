@@ -115,7 +115,7 @@ class UserSystem {
      */
     function createUserAndSendMail($username, $passwordHash) {
         $randomString = $this->hashUtil->generateRandomString();
-        $user = new User(NULL, $username, $passwordHash, Constants::USER_ROLES['notActivated'], $randomString, '0', '', Constants::DEFAULT_LANGUAGE, '', array());
+        $user = new User(NULL, $username, $passwordHash, Constants::USER_ROLES['notActivated'], $randomString, '0', Constants::DEFAULT_LANGUAGE, '');
         $result = $this->userDao->addUser($user);
         if ($result != false) {
             $this->email->send($result->getUsername() . Constants::EMAIL_USER_DOMAIN, $this->i18n->get('activationMailSubject'), $this->i18n->getWithValues('activationMailMessage', [$result->getUsername(), $this->urlUtil->getCurrentDirname() . 'activate.php?user=' . $result->getUsername() . '&key=' . $randomString]));

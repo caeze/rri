@@ -6,8 +6,8 @@ class StaticCodeAnalysis {
         $this->fileUtil = $fileUtil;
     }
     
-    function analyze($ppiRootDirectory, $phpstanDirectory) {
-        $allPhpFilesStr = $this->getAllPhpFilesUnderGivenDirectory($ppiRootDirectory);
+    function analyze($rriRootDirectory, $phpstanDirectory) {
+        $allPhpFilesStr = $this->getAllPhpFilesUnderGivenDirectory($rriRootDirectory);
         $command = 'php ' . $phpstanDirectory . 'phpstan.phar analyse ' . $allPhpFilesStr . ' -c ' . $phpstanDirectory . 'phpstan.neon --level=0';
         return shell_exec($command);
     }
@@ -19,7 +19,7 @@ class StaticCodeAnalysis {
             $path = realpath($startDirectory . DIRECTORY_SEPARATOR . $value);
             if (!is_dir($path) && $this->fileUtil->strEndsWith($path, '.php')) {
                 $retFilesStr .= $path . ' ';
-            } else if (is_dir($path) && $value != '.' && $value != '..' && !$this->fileUtil->strEndsWith($path, 'ppi1.0')) {
+            } else if (is_dir($path) && $value != '.' && $value != '..' && !$this->fileUtil->strEndsWith($path, 'rri1.0')) {
                 $retFilesStr .= $this->getAllPhpFilesUnderGivenDirectory($path);
             }
         }

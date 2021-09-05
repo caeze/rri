@@ -37,6 +37,21 @@ class ArticleSystem {
     function getAllArticlesWithStatus($status) {
         return $this->articleDao->getAllArticlesWithStatus($status);
     }
+
+    /**
+     * Returns all articles from the DB that have an expiry date that is smaller than the current date.
+     */
+    function getAllArticlesThatAreExpired() {
+        $allArticles = $this->articleDao->getAllArticles();
+        $now = $this->dateUtil->getDateTimeNow();
+        $retList = [];
+        foreach ($allArticles as $article) {
+            if ($this->dateUtil->isSmallerThan($article->getExpiresOnDate(), $now)) {
+                $retList[] = $article;
+            }
+        }
+        return $retList;
+    }
     
     /**
      * Returns the article from the DB according to the given unique article ID or NULL if the article was not found.
@@ -46,8 +61,8 @@ class ArticleSystem {
     }
     
     /**
-     * Adds an article to the database and moves the protocol file to the protocols location with a randomly generated name.
-     * Returns the just added protocol with the ID set if the operation was successful, NULL otherwise.
+     * Adds an article to the database.
+     * Returns the just added article with the ID set if the operation was successful, NULL otherwise.
      */
     function addArticle($currentUser, $title, $startingPrice, $expiresOnDate, $description, $uploadedImageFilePaths, $uploadedImageFileExtensions) {
         $imageFileNames = [];
@@ -91,69 +106,59 @@ class ArticleSystem {
     }
     
     /**
-     * Updates the article in the database with the given data.
+     * Updates the article with the given ID in the database with the given data.
+     * If any of the given values is NULL, this value is not set.
      * Returns TRUE if the operation was successful, FALSE otherwise.
      */
-    function updateArticle($articleID, $remark, $examiner) {
+    function updateArticleFully($articleID, $status, $addedByUserID, $addedDate, $remark, $title, $pictureFileName1, $pictureFileName2, $pictureFileName3, $pictureFileName4, $pictureFileName5, $startingPrice, $expiresOnDate, $description, $biddings) {
         $article = $this->articleDao->getArticle($articleID);
         if ($article == NULL) {
             $this->log->error(static::class . '.php', 'Article to ID ' . $articleID . ' not found!');
             return false;
         }
-        $article->setRemark($remark);
-        $article->setExaminer($examiner);
-        return $this->articleDao->updateArticle($article);
-    }
-    
-    /**
-     * Updates the article in the database with the given data.
-     * Returns TRUE if the operation was successful, FALSE otherwise.
-     */
-    function updateArticleStatus($articleID, $newStatus) {
-        $article = $this->articleDao->getArticle($articleID);
-        if ($article == NULL) {
-            $this->log->error(static::class . '.php', 'Article to ID ' . $articleID . ' not found!');
-            return false;
+        if ($status != NULL) {
+            $article->setStatus($status);
         }
-        $article->setStatus($newStatus);
-        return $this->articleDao->updateArticle($article);
-    }
-    
-    /**
-     * Updates the article in the database with the given data.
-     * Returns TRUE if the operation was successful, FALSE otherwise.
-     */
-    function updateArticleFully($articleID, $collaboratorIDs, $status, $uploadedByUserID, $uploadedDate, $remark, $examiner, $fileName, $fileSize, $fileType, $fileExtension) {
-        $article = $this->articleDao->getArticle($articleID);
-        if ($article == NULL) {
-            $this->log->error(static::class . '.php', 'Article to ID ' . $articleID . ' not found!');
-            return false;
+        if ($addedByUserID != NULL) {
+            $article->setAddedByUserID($addedByUserID);
         }
-        $article->setStatus($status);
-        $article->setUploadedByUserID($uploadedByUserID);
-        $article->setCollaboratorIDs($collaboratorIDs);
-        $article->setUploadedDate($uploadedDate);
-        $article->setRemark($remark);
-        $article->setExaminer($examiner);
-        $article->setFileName($fileName);
-        $article->setFileSize($fileSize);
-        $article->setFileType($fileType);
-        $article->setFileExtension($fileExtension);
+        if ($addedDate != NULL) {
+            $article->setAddedDate($addedDate);
+        }
+        if ($remark != NULL) {
+            $article->setRemark($remark);
+        }
+        if ($title != NULL) {
+            $article->setTitle($title);
+        }
+        if ($pictureFileName1 != NULL) {
+            $article->setPictureFileName1($pictureFileName1);
+        }
+        if ($pictureFileName2 != NULL) {
+            $article->setPictureFileName2($pictureFileName2);
+        }
+        if ($pictureFileName3 != NULL) {
+            $article->setPictureFileName3($pictureFileName3);
+        }
+        if ($pictureFileName4 != NULL) {
+            $article->setPictureFileName4($pictureFileName4);
+        }
+        if ($pictureFileName5 != NULL) {
+            $article->setPictureFileName5($pictureFileName5);
+        }
+        if ($startingPrice != NULL) {
+            $article->setStartingPrice($startingPrice);
+        }
+        if ($expiresOnDate != NULL) {
+            $article->setExpiresOnDate($expiresOnDate);
+        }
+        if ($description != NULL) {
+            $article->setDescription($description);
+        }
+        if ($biddings != NULL) {
+            $article->setBiddings($biddings);
+        }
         return $this->articleDao->updateArticle($article);
-    }
-    
-    /**
-     * Returns the number of articles that are in the DB or NULL if something went wrong.
-     */
-    function getNumberOfArticlesTotal($articleID, $uploadedByUserID, $borrowedByUserID) {
-        return $this->articleDao->getNumberOfArticlesTotal($articleID, $uploadedByUserID, $borrowedByUserID);
-    }
-    
-    /**
-     * Returns articles from the DB according to the number of wanted results and the start page.
-     */
-    function getArticles($numberOfResultsWanted, $page, $articleID, $uploadedByUserID, $borrowedByUserID) {
-        return $this->articleDao->getArticles($numberOfResultsWanted, $page, $articleID, $uploadedByUserID, $borrowedByUserID);
     }
     
     /**

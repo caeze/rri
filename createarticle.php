@@ -128,19 +128,6 @@
     
     echo $mainMenu->getMainMenu($i18n, $currentUser);
     
-    echo '<script type="text/javascript">
-                function checkUploadFileSize() {
-                    var input = document.getElementById("protocol_file");
-                    if(input.files && input.files.length == 1) {           
-                        if (input.files[0].size > ' . Constants::MAX_UPLOAD_FILE_SIZE_BYTES . ') {
-                            alert("' . $i18n->get('uploadWillFailAsMaximumFileSizeIs') . ' " + (' . Constants::MAX_UPLOAD_FILE_SIZE_BYTES . '/1024/1024) + "MB.");
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-            </script>';
-    
     function getCreateItemField($currentUser, $dateUtil, $currencyUtil, $i18n, $title, $startingPrice, $expiresOnDate, $description, $titleColor, $startingPriceColor, $expiresOnDateColor, $image1Color, $descriptionColor) {
         return '<form enctype="multipart/form-data" action="createarticle.php" method="POST" onsubmit="checkUploadFileSize();">
                     <input type="hidden" name="MAX_FILE_SIZE" value="' . Constants::MAX_UPLOAD_FILE_SIZE_BYTES . '" />

@@ -106,7 +106,7 @@ class UserDao {
      * If the operation was not successful, FALSE will be returned.
      */
     function addUser($user) {
-        $sql = "INSERT INTO \"Users\" (\"username\", \"passwordHash\", \"role\", \"status\", \"lastLoggedIn\", \"language\", \"comment\") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO \"Users\" (\"username\", \"passwordHash\", \"role\", \"status\", \"lastLoggedIn\", \"language\", \"comment\") VALUES (?, ?, ?, ?, ?, ?, ?)";
         $result = $this->dbConn->exec($sql, [$user->getUsername(), $user->getPasswordHash(), $user->getRole(), $user->getStatus(), $user->getLastLoggedIn(), $user->getLanguage(), $user->getComment()]);
         $id = $result['lastInsertId'];
         if ($id < 1) {

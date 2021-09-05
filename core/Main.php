@@ -77,7 +77,7 @@
     $articleSystem = new ArticleSystem($articleDao, $dateUtil, $fileUtil, $hashUtil, $currencyUtil, $email);
     $logEventSystem = new LogEventSystem($logEventDao, $email, $dateUtil);
     $userSystem = new UserSystem($userDao, $email, $i18n, $hashUtil, $urlUtil, $dateUtil);
-    $recurringTasksSystem = new RecurringTasksSystem($recurringTasksDao, $dateUtil, $fileUtil);
+    $recurringTasksSystem = new RecurringTasksSystem($recurringTasksDao, $articleSystem, $userSystem, $dateUtil, $fileUtil, $email, $i18n);
 
     // include logging class
     require_once('log/Log.php');

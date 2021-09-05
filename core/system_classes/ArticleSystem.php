@@ -47,6 +47,8 @@ class ArticleSystem {
         $retList = [];
         foreach ($allArticles as $article) {
             if ($this->dateUtil->isSmallerThan($article->getExpiresOnDate(), $now)) {
+                $article->setStatus(Constants::ARTICLE_STATUS['expired']);
+                $this->articleDao->updateArticle($article);
                 $retList[] = $article;
             }
         }

@@ -102,6 +102,30 @@ class ArticleDao {
     }
     
     /**
+     * Returns articles from the DB according to the number of wanted results and the start page.
+     */
+    function getArticles($numberOfResultsWanted, $page, $status) {
+        $offset = $numberOfResultsWanted * $page;
+        $sql = "SELECT * FROM \"Articles\" ORDER BY \"ID\" DESC LIMIT " . $numberOfResultsWanted . " OFFSET " . $offset . ";";
+        if ($status != '') {
+            $sql = "SELECT * FROM \"Articles\" WHERE \"status\"='" . $status . "' ORDER BY \"ID\" DESC LIMIT " . $numberOfResultsWanted . " OFFSET " . $offset . ";";
+        }
+        return $this->getArticlesImpl($sql);
+    }
+    
+    /**
+     * Returns the number of articles that are in the DB.
+     */
+    function getNumberOfArticlesTotal($status) {
+        $sql = "SELECT COUNT(*) FROM \"Articles\";";
+        if ($status != '') {
+            $sql = "SELECT COUNT(*) FROM \"Articles\" WHERE \"status\"='" . $status . "';";
+        }
+        $result = $this->dbConn->query($sql);
+        return $result[0]['count'];
+    }
+    
+    /**
      * Inserts the new article into the DB.
      * Returns the given article with also the ID set.
      * If the operation was not successful, FALSE will be returned.

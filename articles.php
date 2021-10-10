@@ -30,7 +30,11 @@
     $widths = array(50, 10, 10, 10, 10, 10);
     $textAlignments = array('left', 'center', 'center', 'center', 'center', 'center');
     
-    $allArticles = $articleSystem->getAllArticles();
+    if ($currentUser->getRole() == Constants::USER_ROLES['admin']) {
+        $allArticles = $articleSystem->getAllArticles();
+    } else {
+        $allArticles = $articleSystem->getAllArticlesWithStatus(Constants::ARTICLE_STATUS['active']);
+    }
     $allArticles = array_reverse($allArticles);
     
     function getHighestBidding($article, $currencyUtil) {

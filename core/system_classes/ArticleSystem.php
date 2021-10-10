@@ -63,6 +63,20 @@ class ArticleSystem {
     }
     
     /**
+     * Returns articles from the DB according to the number of wanted results and the start page.
+     */
+    function getArticles($numberOfResultsWanted, $page, $status) {
+        return $this->articleDao->getArticles($numberOfResultsWanted, $page, $status);
+    }
+    
+    /**
+     * Returns the number of articles that are in the DB.
+     */
+    function getNumberOfArticlesTotal($status) {
+        return $this->articleDao->getNumberOfArticlesTotal($status);
+    }
+    
+    /**
      * Adds an article to the database.
      * Returns the just added article with the ID set if the operation was successful, NULL otherwise.
      */
@@ -105,6 +119,14 @@ class ArticleSystem {
             return NULL;
         }
         return $article;
+    }
+    
+    /**
+     * Updates the article with the given ID in the database with the given status.
+     * Returns TRUE if the operation was successful, FALSE otherwise.
+     */
+    function updateArticleStatus($articleID, $status) {
+        return $this->updateArticleFully($articleID, $status, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     }
     
     /**
@@ -161,6 +183,48 @@ class ArticleSystem {
             $article->setBiddings($biddings);
         }
         return $this->articleDao->updateArticle($article);
+    }
+    
+    /**
+     * Deletes the article from the DB according to the given unique article ID.
+     * Returns TRUE if the transaction was successful, FALSE otherwise.
+     * Also removes all images that belong to that article.
+     */
+    function deleteArticle($article) {
+        $imageFilesOfArticle = [];
+        if ($article->getPictureFileName1() != NULL && $article->getPictureFileName1() != '') {
+            $imageFilesOfArticle[] = $article->getPictureFileName1();
+        }
+        if ($article->getPictureFileName2() != NULL && $article->getPictureFileName2() != '') {
+            $imageFilesOfArticle[] = $article->getPictureFileName2();
+        }
+        if ($article->getPictureFileName3() != NULL && $article->getPictureFileName3() != '') {
+            $imageFilesOfArticle[] = $article->getPictureFileName3();
+        }
+        if ($article->getPictureFileName4() != NULL && $article->getPictureFileName4() != '') {
+            $imageFilesOfArticle[] = $article->getPictureFileName4();
+        }
+        if ($article->getPictureFileName5() != NULL && $article->getPictureFileName5() != '') {
+            $imageFilesOfArticle[] = $article->getPictureFileName5();
+        }
+        foreach ($imageFilesOfArticle as $imageFileName) {
+            $file = $this->fileUtil->getFullPathToBaseDirectory() . Constants::UPLOADED_IMAGES_DIRECTORY . '/' . $imageFileName;
+            if (is_file($file)) {
+                $deleteAllowed = false;
+                foreach (Constants::ALLOWED_FILE_EXTENSION_UPLOAD as $allowedFileExtension) {
+                    if ($this->fileUtil->strEndsWith($file, $allowedFileExtension)) {
+                        $deleteAllowed = true;
+                    }
+                }
+                if ($deleteAllowed) {
+                    unlink($file);
+                } else {
+                    $this->log->error(static::class . '.php', 'Recurring task did not run successfully! Can not delete file that is not an image file: ' . $file);
+                    return false;
+                }
+            }
+        }
+        return $this->articleDao->deleteArticle($article->getID());
     }
     
     /**

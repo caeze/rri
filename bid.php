@@ -16,6 +16,9 @@
             $amount = $currencyUtil->getAmountFromCurrencyString($amountInput);
             if (is_numeric($articleIDInput) && $amount != NULL && is_numeric($amount)) {
                 $article = $articleSystem->getArticle($articleIDInput);
+                if ($article->getStatus() != Constants::ARTICLE_STATUS['active'] && $currentUser->getRole() != Constants::USER_ROLES['admin']) {
+                    $article = NULL;
+                }
                 if ($article != NULL) {
                     $result = $articleSystem->bid($article->getID(), $amount, $currentUser);
                     if ($result) {
@@ -43,6 +46,9 @@
         if (isset($_GET['id'])) {
             if (is_numeric($articleIDInput)) {
                 $article = $articleSystem->getArticle($articleIDInput);
+                if ($article->getStatus() != Constants::ARTICLE_STATUS['active'] && $currentUser->getRole() != Constants::USER_ROLES['admin']) {
+                    $article = NULL;
+                }
                 if ($article == NULL) {
                     $status = 'ARTICLE_NOT_FOUND';
                 }

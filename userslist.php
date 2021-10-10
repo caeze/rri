@@ -15,9 +15,9 @@
         $passwordHash = filter_input(INPUT_POST, 'passwordHash', FILTER_SANITIZE_SPECIAL_CHARS);
         $role = filter_input(INPUT_POST, 'role', FILTER_SANITIZE_ENCODED);
         $status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_ENCODED);
-        $lastLoggedIn = filter_input(INPUT_POST, 'lastLoggedIn', FILTER_SANITIZE_ENCODED);
+        $lastLoggedIn = filter_input(INPUT_POST, 'lastLoggedIn', FILTER_SANITIZE_SPECIAL_CHARS);
         $language = filter_input(INPUT_POST, 'language', FILTER_SANITIZE_ENCODED);
-        $comment = filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_ENCODED);
+        $comment = filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_SPECIAL_CHARS);
         $userID = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_ENCODED);
         
         if ($passwordHash != '' && $role != '' && $language != '' && is_numeric($userID)) {

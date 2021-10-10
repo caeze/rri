@@ -1,9 +1,0 @@
-Debug mail dump, mail was not sent!
-rri@fsi.uni-tuebingen.de
-Article reported as outdated in RRI
-The user admin has reported that the article ÄÖÜäöüß!&#34;§$&#34;§$%&#38;/()= with ID 3 is outdated. Please verify this and handle it (if necessary).
-From: RRI <rri@fsi.uni-tuebingen.de>
-X-Mailer: PHP/7.4.23
-Content-Type: text/plain; charset=UTF-8
-
-

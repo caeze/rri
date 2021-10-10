@@ -25,6 +25,7 @@
 
     // include the database connection class
     require_once('lib_classes/PostgresDBConn.php');
+    //require_once('lib_classes/SQLiteDBConn.php');
     $dbConn = new DBConn(Constants::POSTGRES_HOST, Constants::POSTGRES_PORT, Constants::POSTGRES_DB_NAME, Constants::POSTGRES_USER, Constants::POSTGRES_PASSWORD, 'COLUMN_NAMES');
     
     // internationalization
@@ -49,6 +50,7 @@
     
     // include the database untility class
     require_once('lib_classes/PostgresDBConnDatabaseUtility.php');
+    //require_once('lib_classes/SQLiteDBConnDatabaseUtility.php');
     $databaseUtility = new DBConnDatabaseUtility($dbConn, $dateUtil);
     //$databaseUtility->recreateDatabase();
 

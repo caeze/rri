@@ -5,6 +5,10 @@
         $log->info('showarticle.php', 'User was not logged in');
         $redirect->redirectTo('login.php');
     }
+    if ($currentUser->getRole() != Constants::USER_ROLES['admin']) {
+        $log->error('showarticle.php', 'User was not admin');
+        $redirect->redirectTo('articles.php');
+    }
     
     $status = 'DISPLAY';
     $article = NULL;
@@ -67,7 +71,19 @@
     
     echo $mainMenu->getMainMenu($i18n, $currentUser);
     
-    function getItemDetails($currentArticle, $imageNumber, $currentUser, $articleSystem, $dateUtil, $currencyUtil, $i18n) {
+    function getEmailOfUserID($userSystem, $userID, $addMailTo) {
+        $user = $userSystem->getUser($userID);
+        if ($user == NULL) {
+            return NULL;
+        }
+        $emailAddress = $user->getUsername() . Constants::EMAIL_USER_DOMAIN;
+        if (!$addMailTo) {
+            return $emailAddress;
+        }
+        return '<a href="mailto:' . $emailAddress . '">' . $emailAddress . '</a>';
+    }
+    
+    function getItemDetails($currentArticle, $imageNumber, $currentUser, $articleSystem, $userSystem, $dateUtil, $currencyUtil, $i18n) {
         $expiresOnDateString = $dateUtil->getDifferenceToNowAsString($currentArticle->getExpiresOnDate(), false, $i18n->get('day'), $i18n->get('days'), $i18n->get('hour'), $i18n->get('hours'), $i18n->get('minute'), $i18n->get('minutes'));
         
         $currentlyHighestBiddingValue = $articleSystem->getCurrentlyHighestBidding($currentArticle);
@@ -112,13 +128,7 @@
         $biddingHistoryMap = [];
         foreach ($currentArticle->getBiddings() as $bidding) {
             $biddingWasTimeAgoString = $dateUtil->getDifferenceToNowAsString($bidding->getDate(), true, $i18n->get('day'), $i18n->get('days'), $i18n->get('hour'), $i18n->get('hours'), $i18n->get('minute'), $i18n->get('minutes'));
-            if ($currentUser->getRole() == Constants::USER_ROLES['admin']) {
-                $biddingHistoryMap[$bidding->getID()] = $currencyUtil->formatCentsToCurrency($bidding->getAmount()) . ' (' . $i18n->get('ago') . ' ' . $biddingWasTimeAgoString . '), ' . $i18n->get('byUserID') . ': ' . $bidding->getBiddingUserID();
-            } else if ($currentUser->getID() == $bidding->getBiddingUserID()) {
-                $biddingHistoryMap[$bidding->getID()] = $currencyUtil->formatCentsToCurrency($bidding->getAmount()) . ' (' . $i18n->get('ago') . ' ' . $biddingWasTimeAgoString . '), ' . $i18n->get('byYou') . ' (' . $currentUser->getUsername() . ')';
-            } else {
-                $biddingHistoryMap[$bidding->getID()] = $currencyUtil->formatCentsToCurrency($bidding->getAmount()) . ' (' . $i18n->get('ago') . ' ' . $biddingWasTimeAgoString . ')';
-            }
+            $biddingHistoryMap[$bidding->getID()] = $currencyUtil->formatCentsToCurrency($bidding->getAmount()) . ' (' . $i18n->get('ago') . ' ' . $biddingWasTimeAgoString . '), ' . $i18n->get('byUserID') . ': ' . $bidding->getBiddingUserID() . ' (' . getEmailOfUserID($userSystem, $bidding->getBiddingUserID(), true) . ')';
         }
         ksort($biddingHistoryMap);
         $biddingHistoryMap = array_reverse($biddingHistoryMap, true);
@@ -135,42 +145,63 @@
         return '<form action="showarticle.php" method="POST">
                     <input type="hidden" id="id" name="id" value="' . $currentArticle->getID() . '" />
                     <input type="hidden" name="MAX_FILE_SIZE" value="' . Constants::MAX_UPLOAD_FILE_SIZE_BYTES . '" />
-                    <h3 style="padding: 20px 40px 0px 40px;">' . $currentArticle->getTitle() . '</h3>
-                    <table style="width: 100%; padding: 20px;">
+                    <table style="width: 100%;">
                         <tr>
-                            <td style="width: 50%; padding: 20px; vertical-align: center; text-align: center;">
-                                <img src="' . $image . '" style="max-width: 100%; max-height: 300px; width: auto;">
-                                <table style="width: 100%; padding: 0px;">
-                                    <tr>
-                                        <td style="text-align: left;">
-                                            <a id="styledButton" href="?id=' . $currentArticle->getID() . '&imageNumber=' . $previousImageNumber . '">&laquo;&nbsp;' . $i18n->get('previousImage') . '</a>
-                                        </td>
-                                        <td style="text-align: right;">
-                                            <a id="styledButton" href="?id=' . $currentArticle->getID() . '&imageNumber=' . $nextImageNumber . '">' . $i18n->get('nextImage') . '&nbsp;&raquo;</a>
-                                        </td>
-                                    </tr>
-                                </table>
+                            <td style="width: 50%; text-align: left;">
+                                <a href="articleslist.php" id="styledButton">
+                                    &laquo;&nbsp;' . $i18n->get('returnToList') . '
+                                </a>
                             </td>
-                            <td style="width: 50%; padding: 20px; vertical-align: center;">
-                                ' . $i18n->get('biddingEndsIn') . ':&nbsp;' . $expiresOnDateString . '<br><br>
-                                ' . $i18n->get('currentBid') . ':&nbsp;' . $currentlyHighestBidding . '<br><br>
-                                ' . $i18n->get('newBid') . ':&nbsp;
-                                <input type="text" id="amount" name="amount" size="4" style="-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;" required value="' . $currencyUtil->formatCentsToCurrency($currentlyHighestBiddingValue + 100) . '">&nbsp;
-                                <input type="submit" value="' . $i18n->get('submit') . '"><br><br>
-                                ' . $i18n->get('biddingHistory') . ':<br>
-                                ' . $biddingHistory . '
+                            <td style="width: 50%; text-align: right;">
+                                <a href="articleslist.php?deleteID=' . $currentArticle->getID() . '" id="styledButtonRed">
+                                    <img src="static/img/delete.png" alt="delete" style="height: 24px; vertical-align: middle;">
+                                    ' . $i18n->get('markThisArticleForDeletion') . '
+                                </a>
                             </td>
                         </tr>
                     </table>
+                    <h3 style="padding: 20px 40px 0px 40px;">' . $currentArticle->getTitle() . '</h3>
                     <p style="padding: 0px 40px 40px 40px;">
+                       
+                        ' . $i18n->get('biddingHistory') . ':<br>
+                        ' . $biddingHistory . '<br><br><br>
+                        ' . $i18n->get('ID') . ':&nbsp;' . $currentArticle->getID() . '<br><br>
+                        ' . $i18n->get('status') . ':&nbsp;' . $currentArticle->getStatus() . '<br><br>
+                        ' . $i18n->get('addedByUserID') . ':&nbsp;' . $currentArticle->getAddedByUserID() . ' (' . getEmailOfUserID($userSystem, $currentArticle->getAddedByUserID(), false) . ')<br><br>
+                        ' . $i18n->get('addedDate') . ':&nbsp;' . $dateUtil->dateTimeToStringForDisplaying($currentArticle->getAddedDate(), $currentUser->getLanguage()) . '<br><br>
+                        ' . $i18n->get('remark') . ':&nbsp;' . $currentArticle->getRemark() . '<br><br>
+                        ' . $i18n->get('articleTitle') . ':&nbsp;' . $currentArticle->getTitle() . '<br><br>
+                        ' . $i18n->get('pictureFileName1') . ':&nbsp;' . $currentArticle->getPictureFileName1() . '<br><br>
+                        ' . $i18n->get('pictureFileName2') . ':&nbsp;' . $currentArticle->getPictureFileName2() . '<br><br>
+                        ' . $i18n->get('pictureFileName3') . ':&nbsp;' . $currentArticle->getPictureFileName3() . '<br><br>
+                        ' . $i18n->get('pictureFileName4') . ':&nbsp;' . $currentArticle->getPictureFileName4() . '<br><br>
+                        ' . $i18n->get('pictureFileName5') . ':&nbsp;' . $currentArticle->getPictureFileName5() . '<br><br>
+                        ' . $i18n->get('startingPrice') . ':&nbsp;' . $currentArticle->getStartingPrice() . '<br><br>
+                        ' . $i18n->get('expiresOnDate') . ':&nbsp;' . $dateUtil->dateTimeToStringForDisplaying($currentArticle->getExpiresOnDate(), $currentUser->getLanguage()) . '<br><br>
+                        ' . $i18n->get('biddingEndsIn') . ':&nbsp;' . $expiresOnDateString . '<br><br>
+                        ' . $i18n->get('currentBid') . ':&nbsp;' . $currentlyHighestBidding . '<br><br>
+                        ' . $i18n->get('description') . ':<br>
                         ' . $currentArticle->getDescription() . '
+                        <center>
+                            <img src="' . $image . '" style="max-width: 100%; max-height: 300px; width: auto;">
+                            <table style="width: 100%; padding: 0px;">
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <a id="styledButton" href="?id=' . $currentArticle->getID() . '&imageNumber=' . $previousImageNumber . '">&laquo;&nbsp;' . $i18n->get('previousImage') . '</a>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a id="styledButton" href="?id=' . $currentArticle->getID() . '&imageNumber=' . $nextImageNumber . '">' . $i18n->get('nextImage') . '&nbsp;&raquo;</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </center>
                     </p>
                 </form>';
     }
 
     $content = '';
     if ($status == 'DISPLAY') {
-        $content = getItemDetails($article, $imageNumber, $currentUser, $articleSystem, $dateUtil, $currencyUtil, $i18n);
+        $content = getItemDetails($article, $imageNumber, $currentUser, $articleSystem, $userSystem, $dateUtil, $currencyUtil, $i18n);
     } else if ($status == 'BIDDING_SUCCESSFUL') {
         $content = '<br><br><center>' . $i18n->get('biddingSuccessful') . '<br><br><a id="styledButton" href="articles.php">&laquo;&nbsp;' . $i18n->get('backToArticlesList') . '</a>&nbsp;&nbsp;<a id="styledButton" href="?id=' . $article->getID() . '">' . $i18n->get('viewArticleAgain') . '</a></center><br><br>';
     } else if ($status == 'BIDDING_FAILED') {

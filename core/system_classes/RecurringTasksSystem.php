@@ -93,34 +93,7 @@ class RecurringTasksSystem {
         if ($taskName == Constants::RECURRING_TASKS['removeToBeDeletedArticles']) {
             $toBeDeleted = $this->articleSystem->getAllArticlesWithStatus(Constants::ARTICLE_STATUS['toBeDeleted']);
             foreach ($toBeDeleted as $article) {
-                $imageFilesOfArticle = [];
-                if ($article->getPictureFileName1() != NULL && $currentArticle->getPictureFileName1() != '') {
-                    $imageFilesOfArticle[] = $article->getPictureFileName1();
-                }
-                if ($article->getPictureFileName2() != NULL && $currentArticle->getPictureFileName2() != '') {
-                    $imageFilesOfArticle[] = $article->getPictureFileName2();
-                }
-                if ($article->getPictureFileName3() != NULL && $currentArticle->getPictureFileName3() != '') {
-                    $imageFilesOfArticle[] = $article->getPictureFileName3();
-                }
-                if ($article->getPictureFileName4() != NULL && $currentArticle->getPictureFileName4() != '') {
-                    $imageFilesOfArticle[] = $article->getPictureFileName4();
-                }
-                if ($article->getPictureFileName5() != NULL && $currentArticle->getPictureFileName5() != '') {
-                    $imageFilesOfArticle[] = $article->getPictureFileName5();
-                }
-                foreach ($imageFilesOfArticle as $imageFileName) {
-                    $file = $this->fileUtil->getFullPathToBaseDirectory() . Constants::UPLOADED_IMAGES_DIRECTORY . '/' . $imageFileName;
-                    if (is_file($file)) {
-                        if ($this->fileUtil->strEndsWith($file, Constants::ALLOWED_FILE_EXTENSION_UPLOAD)) {
-                            unlink($file);
-                        } else {
-                            $result = 'ERROR';
-                            $this->log->error(static::class . '.php', 'Recurring task did not run successfully! Can not delete file that is not an image file: ' . $file);
-                        }
-                    }
-                }
-                $deletionResult = $this->articleDao->deleteArticle($article->getID());
+                $deletionResult = $this->articleSystem->deleteArticle($article);
                 if ($deletionResult == false) {
                     $result = 'ERROR';
                     $this->log->error(static::class . '.php', 'Recurring task did not run successfully! Could not delete article with ID ' . $article->getID());
@@ -129,7 +102,8 @@ class RecurringTasksSystem {
         }
         if ($taskName == Constants::RECURRING_TASKS['checkForExpiredBiddings']) {
             $allExpiredArticles = $this->articleSystem->getAllArticlesThatAreExpired();
-            if (sizeof($allExpiredArticles) != 0) {
+            $user = $this->userSystem->getLoggedInUser();
+            if (sizeof($allExpiredArticles) != 0 && $user != NULL) {
                 $expiredArticlesText = '';
                 foreach ($allExpiredArticles as $expiredArticle) {
                     if ($expiredArticlesText != '') {
@@ -137,7 +111,6 @@ class RecurringTasksSystem {
                     }
                     $expiredArticlesText .= $this->i18n->get('ID') . ': ' . $expiredArticle->getID() . ', ' . $this->i18n->get('articleTitle') . ': ' . $expiredArticle->getTitle();
                 }
-                $user = $this->userSystem->getLoggedInUser();
                 $mailResult = $this->email->send($user->getUsername() . Constants::EMAIL_USER_DOMAIN, $this->i18n->get('expiredArticlesFound'), $this->i18n->getWithValues('expiredArticlesFoundPleaseCheckBackWithHighestBidders', [$expiredArticlesText]));
                 if ($mailResult) {
                     $result = 'SUCCESS';

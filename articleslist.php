@@ -107,10 +107,10 @@
     echo '<br><br>';
     
     echo '<div style="width: 5%; display: inline-block; text-align: center;">' . $i18n->get('ID') . '</div>';
-    echo '<div style="width: 10%; display: inline-block;">' . $i18n->get('status') . '</div>';
-    echo '<div style="width: 10%; display: inline-block;">' . $i18n->get('addedByUserID') . '</div>';
-    echo '<div style="width: 5%; display: inline-block;">' . $i18n->get('addedDate') . '</div>';
-    echo '<div style="width: 5%; display: inline-block;">' . $i18n->get('remark') . '</div>';
+    echo '<div style="width: 5%; display: inline-block;">' . $i18n->get('status') . '</div>';
+    echo '<div style="width: 5%; display: inline-block;">' . $i18n->get('addedByUserID') . '</div>';
+    echo '<div style="width: 10%; display: inline-block;">' . $i18n->get('addedDate') . '</div>';
+    echo '<div style="width: 10%; display: inline-block;">' . $i18n->get('remark') . '</div>';
     echo '<div style="width: 10%; display: inline-block;">' . $i18n->get('articleTitle') . '</div>';
     echo '<div style="width: 5%; display: inline-block;">' . $i18n->get('startingPrice') . '</div>';
     echo '<div style="width: 10%; display: inline-block;">' . $i18n->get('expiresOnDate') . '</div>';
@@ -130,10 +130,10 @@
         }
         echo '<form method="POST" action="articleslist.php?page=' . $page . '"' . $color . '>';
         echo '<div style="width: 5%; display: inline-block; text-align: center;">' . $article->getID() . '</div>';
-        echo '<div style="width: 10%; display: inline-block;">' . '<input type="text" readonly name="status" value="' . $article->getStatus() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
-        echo '<div style="width: 10%; display: inline-block;">' . '<input type="text" name="addedByUserID" value="' . $article->getAddedByUserID() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
-        echo '<div style="width: 5%; display: inline-block;">' . '<input type="text" name="addedDate" value="' . $dateUtil->dateTimeToStringForDisplaying($article->getAddedDate(), $currentUser->getLanguage()) . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
-        echo '<div style="width: 5%; display: inline-block;">' . '<input type="text" name="remark" value="' . $article->getRemark() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
+        echo '<div style="width: 5%; display: inline-block;">' . '<input type="text" readonly name="status" value="' . $article->getStatus() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
+        echo '<div style="width: 5%; display: inline-block;">' . '<input type="text" name="addedByUserID" value="' . $article->getAddedByUserID() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
+        echo '<div style="width: 10%; display: inline-block;">' . '<input type="text" name="addedDate" value="' . $dateUtil->dateTimeToStringForDisplaying($article->getAddedDate(), $currentUser->getLanguage()) . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
+        echo '<div style="width: 10%; display: inline-block;">' . '<input type="text" name="remark" value="' . $article->getRemark() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
         echo '<div style="width: 10%; display: inline-block;">' . '<input type="text" name="title" value="' . $article->getTitle() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
         echo '<div style="width: 5%; display: inline-block;">' . '<input type="text" name="startingPrice" value="' . $article->getStartingPrice() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
         echo '<div style="width: 10%; display: inline-block;">' . '<input type="text" name="expiresOnDate" value="' . $dateUtil->dateTimeToStringForDisplaying($article->getExpiresOnDate(), $currentUser->getLanguage()) . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';

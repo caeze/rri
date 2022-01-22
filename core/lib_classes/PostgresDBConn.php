@@ -1,5 +1,5 @@
 <?php
-class DBConn {
+class PostgresDBConn {
     // postgres installation hints
     // https://www.howtoforge.de/anleitung/wie-man-postgresql-und-phppgadmin-auf-ubuntu-1804-lts-installiert/
     

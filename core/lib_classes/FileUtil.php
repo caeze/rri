@@ -19,9 +19,18 @@ class FileUtil {
     
     /**
      * Checks if the given path has the given file extension.
+     * $extension: string or array of string
      */
     function strEndsWith($path, $extension) {
-        return substr_compare($path, $extension, -strlen($extension)) === 0;
+        if (!is_array($extension)) {
+            $extension = array($extension);
+        }
+        foreach ($extension as $value) {
+            if(substr_compare($path, $value, -strlen($value)) === 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 ?>

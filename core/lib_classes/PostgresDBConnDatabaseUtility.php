@@ -1,5 +1,5 @@
 <?php
-class DBConnDatabaseUtility {
+class PostgresDBConnDatabaseUtility {
     private $dbConn = null;
     private $dateUtil = null;
 

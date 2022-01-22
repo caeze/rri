@@ -5,7 +5,7 @@ class UrlUtil {
     function getCurrentPageUrlInfo() {
         $protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'https') === FALSE ? 'http' : 'https';
         $host = $_SERVER['HTTP_HOST'];
-        if ($host == 'localhost' || $protocol == 'http') {
+        if ($host == 'localhost') {
             $this->slashAtEnd = '/';
         }
         $script = $_SERVER['SCRIPT_NAME'];

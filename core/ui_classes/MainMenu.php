@@ -1,9 +1,9 @@
 <?php
 class MainMenu {
     function getMainMenu($i18n, $user) {
-        $menu = '<nobr><div style="padding: 10px; text-align: center;">';
+        $menu = '<div style="padding: 10px; text-align: center;">';
         $menu .= '<a id="styledButton" href="articles.php">' . $i18n->get('showArticles') . '</a>';
-        $menu .= '<a id="styledButton" href="createarticle.php">' . $i18n->get('createArticle') . '</a></nobr>';
+        $menu .= '<a id="styledButton" href="createarticle.php">' . $i18n->get('createArticle') . '</a>';
         if ($user->getRole() == Constants::USER_ROLES['admin']) {
             $menu .= '<br>';
             $menu .= '<a id="styledButtonGray">' . $i18n->get('adminOptions') . ': ' . '</a>';

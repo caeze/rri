@@ -21,7 +21,7 @@ class Header {
                     <link rel="icon" type="image/png" sizes="32x32" href="static/img/fsiFavicon.png' . $GLOBALS['VERSION_STRING'] . '">';
         array_unshift($listOfStylesheets, 'main.css');
         foreach ($listOfStylesheets as &$stylesheet) {
-            $header .= ' <link rel="stylesheet" href="static/css/' . $stylesheet . '">' . $GLOBALS['VERSION_STRING'];
+            $header .= ' <link rel="stylesheet" href="static/css/' . $stylesheet . $GLOBALS['VERSION_STRING'] . '">';
         }
         $header .= '</head>
 

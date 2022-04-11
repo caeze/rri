@@ -154,7 +154,7 @@
                             </td>
                             <td style="width: 50%; text-align: right;">
                                 <a href="articleslist.php?deleteID=' . $currentArticle->getID() . '" id="styledButtonRed">
-                                    <img src="static/img/delete.png" alt="delete" style="height: 24px; vertical-align: middle;">
+                                    <img src="static/img/delete.png' . $GLOBALS['VERSION_STRING'] . '" alt="delete" style="height: 24px; vertical-align: middle;">
                                     ' . $i18n->get('markThisArticleForDeletion') . '
                                 </a>
                             </td>

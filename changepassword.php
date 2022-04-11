@@ -60,7 +60,7 @@
             $backButton = '<center><a href="articles.php" id="styledButton">' .  $i18n->get('back') . '</a></center>';
         }
         return '<div id="loginField">
-                    <center><div id="rriLogo"><img src="static/img/rriLogo.png" style="height: 55px;" alt="rri logo"></div></center>
+                    <center><div id="rriLogo"><img src="static/img/rriLogo.png' . $GLOBALS['VERSION_STRING'] . '" style="height: 55px;" alt="rri logo"></div></center>
                     <div id="infoText">' . $message . '</div>
                     <form method="POST" action="">
                         <input type="' . $typePassword . '" id="username" name="old_password" placeholder="' . $i18n->get('oldPassword') . '"' . $colorOldPassword . ' required>

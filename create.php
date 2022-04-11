@@ -48,7 +48,7 @@
     function getCreateField($message, $username, $i18n) {
         return '<div id="loginField">
                 <br>
-                <img src="static/img/rriLogo.png" id="rriLogo" alt="rri logo">
+                <img src="static/img/rriLogo.png' . $GLOBALS['VERSION_STRING'] . '" id="rriLogo" alt="rri logo">
                 <br>
                 <br>
                 <div id="infoText">' . $message . '</div>

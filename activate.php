@@ -37,13 +37,13 @@
     echo $header->getHeader($i18n->get('title'), $i18n->get('activateAccount'), array('login.css', 'activate.css', 'button.css'));
 
     function getActivationField($message, $success, $i18n) {
-        $image = 'rriLogo.png';
+        $image = 'rriLogo.png' . $GLOBALS['VERSION_STRING'];
         $goToLogin = '';
         if ($success == 'SUCCESS') {
-            $image = 'activation_successful.png';
+            $image = 'activation_successful.png' . $GLOBALS['VERSION_STRING'];
             $goToLogin = '<center><a href="login.php" id="styledButton">' . $i18n->get('backToLogin') . '</a></center><br><br>';
         } else if ($success == 'NO_SUCCESS') {
-            $image = 'activation_unsuccessful.png';
+            $image = 'activation_unsuccessful.png' . $GLOBALS['VERSION_STRING'];
         }
         return '<div id="loginField">
                 <br>

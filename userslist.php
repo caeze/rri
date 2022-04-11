@@ -159,12 +159,12 @@
         echo '<div style="width: 20%; display: inline-block;">' . '<input type="text" name="comment" value="' . $user->getComment() . '" style="display: table-cell; width: calc(100% - 18px);">' . '</div>';
         echo '<div style="width: 15%; display: inline-block; text-align: center;">
                     <a href="?deleteID=' . $user->getID() . '" id="styledButtonRed">
-                        <img src="static/img/delete.png" alt="delete user" style="height: 24px; vertical-align: middle;">
+                        <img src="static/img/delete.png' . $GLOBALS['VERSION_STRING'] . '" alt="delete user" style="height: 24px; vertical-align: middle;">
                     </a>
                 </div>';
         echo '<div style="width: 10%; display: inline-block; text-align: center;">' . 
                     '<button type="submit" id="styledButton" name="id" value="' . $user->getID() . '" style="padding: 3px; width: 40px; height: 40px; vertical-align: middle;">
-                        <img src="static/img/save.png" alt="submit" style="height: 24px;">
+                        <img src="static/img/save.png' . $GLOBALS['VERSION_STRING'] . '" alt="submit" style="height: 24px;">
                     </button>' .
                 '</div>';
         echo '</form>';

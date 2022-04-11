@@ -56,7 +56,7 @@
         $row[] = getHighestBidding($article, $currencyUtil);
         $row[] = $dateUtil->dateTimeToStringForDisplaying($article->getAddedDate(), $currentUser->getLanguage());
         $row[] = $dateUtil->dateTimeToStringForDisplaying($article->getExpiresOnDate(), $currentUser->getLanguage());
-        $row[] = '<a id="styledButton" href="bid.php?id=' . $article->getID() . '"><img src="static/img/bid.png" style="height: 24px; vertical-align: middle;">&nbsp;&nbsp;' . $i18n->get('viewAndBid') . '</a>';
+        $row[] = '<a id="styledButton" href="bid.php?id=' . $article->getID() . '"><img src="static/img/bid.png' . $GLOBALS['VERSION_STRING'] . '" style="height: 24px; vertical-align: middle;">&nbsp;&nbsp;' . $i18n->get('viewAndBid') . '</a>';
         $reportingPossible = true;
         if (isset($_GET['report'])) {
             if (is_numeric($reportArticleID)) {
@@ -66,9 +66,9 @@
             }
         }
         if ($reportingPossible) {
-            $row[] = '<a id="styledButtonRed" href="?report=' . $article->getID() . '"><img src="static/img/report.png" style="height: 24px; vertical-align: middle;"></a>';
+            $row[] = '<a id="styledButtonRed" href="?report=' . $article->getID() . '"><img src="static/img/report.png' . $GLOBALS['VERSION_STRING'] . '" style="height: 24px; vertical-align: middle;"></a>';
         } else {
-            $row[] = '<a id="styledButtonGray" href=""><img src="static/img/report.png" style="height: 24px; vertical-align: middle;"></a>';
+            $row[] = '<a id="styledButtonGray" href=""><img src="static/img/report.png' . $GLOBALS['VERSION_STRING'] . '" style="height: 24px; vertical-align: middle;"></a>';
         }
         
         if ($insertBeginningOfArray) {
